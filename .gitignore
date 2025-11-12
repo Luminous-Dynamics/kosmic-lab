@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Data & outputs
+data/
+*.parquet
+*.feather
+*.h5
+*.csv
+*.npz
+
+# Logs
+logs/
+*.log
+
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.out
+*.toc
+*.synctex.gz
+
+# Jupyter & analysis artefacts
+.ipynb_checkpoints/
+*.ipynb
+
+# Build artifacts
+target/
+*.lock
+incremental/
+
+# OS-specific
+.DS_Store
+Thumbs.db
