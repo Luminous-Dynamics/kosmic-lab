@@ -3,8 +3,8 @@
 PYTHON ?= python3
 LOGDIR ?= logs/fre_phase1
 
-.PHONY: help init lint test fre-run historical-run docs
-.PHONY: dashboard notebook ai-suggest coverage demo clean
+.PHONY: help init lint test fre-run historical-run docs docs-serve docs-clean
+.PHONY: dashboard notebook ai-suggest coverage demo clean benchmarks
 .PHONY: holochain-publish holochain-query holochain-verify mycelix-demo
 .PHONY: format type-check security-check ci-local review-improvements
 
@@ -70,6 +70,26 @@ demo:  # Run quick demo (5 min)
 docs:  # Build Sphinx documentation
 	cd docs && poetry run make html
 	@echo "📚 Docs: docs/_build/html/index.html"
+
+docs-serve:  # Build and serve docs locally
+	cd docs && poetry run make html
+	@echo "📚 Starting documentation server..."
+	@echo "📖 Open http://localhost:8000 in your browser"
+	cd docs/_build/html && python -m http.server 8000
+
+docs-clean:  # Clean documentation build artifacts
+	cd docs && make clean
+	@echo "🧹 Documentation build cleaned!"
+
+benchmarks:  # Run performance benchmarks
+	@echo "⚡ Running performance benchmarks..."
+	poetry run python benchmarks/run_benchmarks.py
+	@echo "✅ Benchmarks complete!"
+
+benchmarks-save:  # Run and save benchmark results
+	@echo "⚡ Running and saving benchmarks..."
+	poetry run python benchmarks/run_benchmarks.py --save benchmarks/results/benchmark_$(shell date +%Y%m%d_%H%M%S).json
+	@echo "✅ Benchmarks saved!"
 
 clean:  # Remove generated files
 	rm -rf __pycache__ .pytest_cache htmlcov .coverage

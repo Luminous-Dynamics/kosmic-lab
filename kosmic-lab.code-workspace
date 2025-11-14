@@ -1,0 +1,386 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		// Python Configuration
+		"python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+		"python.terminal.activateEnvironment": true,
+		"python.analysis.typeCheckingMode": "basic",
+		"python.analysis.autoImportCompletions": true,
+		"python.analysis.diagnosticMode": "workspace",
+
+		// Formatting
+		"python.formatting.provider": "black",
+		"python.formatting.blackArgs": [
+			"--line-length=88"
+		],
+		"[python]": {
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": true
+			},
+			"editor.defaultFormatter": "ms-python.black-formatter"
+		},
+
+		// Linting
+		"python.linting.enabled": true,
+		"python.linting.mypyEnabled": true,
+		"python.linting.mypyArgs": [
+			"--config-file=pyproject.toml"
+		],
+		"python.linting.pylintEnabled": false,
+		"python.linting.flake8Enabled": true,
+		"python.linting.flake8Args": [
+			"--max-line-length=88",
+			"--extend-ignore=E203,W503"
+		],
+
+		// Testing
+		"python.testing.pytestEnabled": true,
+		"python.testing.unittestEnabled": false,
+		"python.testing.pytestArgs": [
+			"tests",
+			"-v",
+			"--tb=short"
+		],
+		"python.testing.autoTestDiscoverOnSaveEnabled": true,
+
+		// Editor
+		"editor.rulers": [88],
+		"editor.tabSize": 4,
+		"editor.insertSpaces": true,
+		"editor.trimAutoWhitespace": true,
+		"files.trimTrailingWhitespace": true,
+		"files.insertFinalNewline": true,
+		"files.trimFinalNewlines": true,
+
+		// File Associations
+		"files.associations": {
+			"*.yml": "yaml",
+			"*.yaml": "yaml",
+			"*.md": "markdown",
+			"Dockerfile*": "dockerfile",
+			".dockerignore": "ignore",
+			".gitignore": "ignore"
+		},
+
+		// File Exclusions
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/*.pyc": true,
+			"**/*.pyo": true,
+			"**/.pytest_cache": true,
+			"**/.mypy_cache": true,
+			"**/.coverage": true,
+			"**/htmlcov": true,
+			"**/.DS_Store": true,
+			"**/.venv": false,
+			"**/node_modules": true
+		},
+
+		"search.exclude": {
+			"**/__pycache__": true,
+			"**/*.pyc": true,
+			"**/.pytest_cache": true,
+			"**/.mypy_cache": true,
+			"**/htmlcov": true,
+			"**/logs": true,
+			"**/data": true,
+			"**/.venv": true,
+			"**/node_modules": true,
+			"**/docs/_build": true
+		},
+
+		// Terminal
+		"terminal.integrated.cwd": "${workspaceFolder}",
+		"terminal.integrated.env.osx": {
+			"PYTHONPATH": "${workspaceFolder}"
+		},
+		"terminal.integrated.env.linux": {
+			"PYTHONPATH": "${workspaceFolder}"
+		},
+		"terminal.integrated.env.windows": {
+			"PYTHONPATH": "${workspaceFolder}"
+		},
+
+		// Git
+		"git.enableSmartCommit": true,
+		"git.confirmSync": false,
+		"git.autofetch": true,
+
+		// Markdown
+		"[markdown]": {
+			"editor.wordWrap": "on",
+			"editor.quickSuggestions": {
+				"comments": "on",
+				"strings": "on",
+				"other": "on"
+			}
+		},
+
+		// JSON
+		"[json]": {
+			"editor.formatOnSave": true,
+			"editor.defaultFormatter": "vscode.json-language-features"
+		},
+		"[jsonc]": {
+			"editor.formatOnSave": true,
+			"editor.defaultFormatter": "vscode.json-language-features"
+		},
+
+		// YAML
+		"[yaml]": {
+			"editor.formatOnSave": true,
+			"editor.insertSpaces": true,
+			"editor.tabSize": 2
+		},
+
+		// Spell Checking (if using Code Spell Checker extension)
+		"cSpell.words": [
+			"kosmic",
+			"kcodex",
+			"kpass",
+			"mycelix",
+			"bioelectric",
+			"vmem",
+			"pytest",
+			"numpy",
+			"scipy",
+			"pandas",
+			"matplotlib",
+			"seaborn",
+			"holochain",
+			"pyproject"
+		],
+
+		// Explorer
+		"explorer.confirmDelete": false,
+		"explorer.confirmDragAndDrop": false,
+
+		// Breadcrumbs
+		"breadcrumbs.enabled": true,
+
+		// Auto Save
+		"files.autoSave": "afterDelay",
+		"files.autoSaveDelay": 1000
+	},
+	"extensions": {
+		"recommendations": [
+			// Python
+			"ms-python.python",
+			"ms-python.vscode-pylance",
+			"ms-python.black-formatter",
+			"ms-python.isort",
+
+			// Testing
+			"littlefoxteam.vscode-python-test-adapter",
+
+			// Git
+			"eamodio.gitlens",
+			"mhutchie.git-graph",
+
+			// Documentation
+			"yzhang.markdown-all-in-one",
+			"davidanson.vscode-markdownlint",
+			"trond-snekvik.simple-rst",
+
+			// Containers
+			"ms-azuretools.vscode-docker",
+
+			// YAML
+			"redhat.vscode-yaml",
+
+			// Code Quality
+			"streetsidesoftware.code-spell-checker",
+			"editorconfig.editorconfig",
+
+			// Productivity
+			"gruntfuggly.todo-tree",
+			"wayou.vscode-todo-highlight",
+
+			// Jupyter (optional)
+			"ms-toolsai.jupyter",
+			"ms-toolsai.jupyter-keymap",
+			"ms-toolsai.jupyter-renderers"
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Python: Current File",
+				"type": "python",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"justMyCode": false,
+				"env": {
+					"PYTHONPATH": "${workspaceFolder}"
+				}
+			},
+			{
+				"name": "Python: Run Tests",
+				"type": "python",
+				"request": "launch",
+				"module": "pytest",
+				"args": [
+					"-v",
+					"--tb=short",
+					"tests/"
+				],
+				"console": "integratedTerminal",
+				"justMyCode": false
+			},
+			{
+				"name": "Python: Run Current Test File",
+				"type": "python",
+				"request": "launch",
+				"module": "pytest",
+				"args": [
+					"-v",
+					"--tb=short",
+					"${file}"
+				],
+				"console": "integratedTerminal",
+				"justMyCode": false
+			},
+			{
+				"name": "Example: Hello Kosmic",
+				"type": "python",
+				"request": "launch",
+				"program": "${workspaceFolder}/examples/01_hello_kosmic.py",
+				"console": "integratedTerminal",
+				"justMyCode": false
+			},
+			{
+				"name": "Example: Advanced K-Index",
+				"type": "python",
+				"request": "launch",
+				"program": "${workspaceFolder}/examples/02_advanced_k_index.py",
+				"console": "integratedTerminal",
+				"justMyCode": false
+			},
+			{
+				"name": "Dashboard",
+				"type": "python",
+				"request": "launch",
+				"program": "${workspaceFolder}/scripts/kosmic_dashboard.py",
+				"args": [
+					"--logdir",
+					"logs",
+					"--port",
+					"8050"
+				],
+				"console": "integratedTerminal",
+				"justMyCode": false
+			},
+			{
+				"name": "Benchmarks",
+				"type": "python",
+				"request": "launch",
+				"program": "${workspaceFolder}/benchmarks/run_benchmarks.py",
+				"console": "integratedTerminal",
+				"justMyCode": false
+			}
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Format Code",
+				"type": "shell",
+				"command": "make format",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Run Tests",
+				"type": "shell",
+				"command": "make test",
+				"group": {
+					"kind": "test",
+					"isDefault": true
+				},
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Type Check",
+				"type": "shell",
+				"command": "make type-check",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Lint",
+				"type": "shell",
+				"command": "make lint",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Full CI",
+				"type": "shell",
+				"command": "make ci-local",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Build Docs",
+				"type": "shell",
+				"command": "make docs",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Serve Docs",
+				"type": "shell",
+				"command": "make docs-serve",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "dedicated"
+				}
+			},
+			{
+				"label": "Run Benchmarks",
+				"type": "shell",
+				"command": "make benchmarks",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared"
+				}
+			}
+		]
+	}
+}

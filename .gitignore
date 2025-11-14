@@ -35,6 +35,11 @@ target/
 *.lock
 incremental/
 
+# Documentation build
+docs/_build/
+docs/_static/
+docs/_templates/
+
 # OS-specific
 .DS_Store
 Thumbs.db
