@@ -1,4 +1,5 @@
 """Quick analysis for modern-era historical K(t) hypotheses."""
+
 from __future__ import annotations
 
 from pathlib import Path

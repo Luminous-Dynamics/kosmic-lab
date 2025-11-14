@@ -1,4 +1,5 @@
 """Audit utility for comparing corridor sets against a reference."""
+
 from __future__ import annotations
 
 from pathlib import Path

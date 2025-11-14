@@ -10,6 +10,7 @@ Where:
 
 Bounds: K ∈ [0, 2]
 """
+
 import numpy as np
 from scipy.stats import pearsonr, spearmanr
 from typing import Any, Dict, Tuple
@@ -53,10 +54,7 @@ def k_index(obs_norms: np.ndarray, act_norms: np.ndarray) -> float:
     return k
 
 
-def k_index_robust(
-    obs_norms: np.ndarray,
-    act_norms: np.ndarray
-) -> Dict[str, float]:
+def k_index_robust(obs_norms: np.ndarray, act_norms: np.ndarray) -> Dict[str, float]:
     """
     Compute K-Index with robust variants.
 
@@ -80,11 +78,7 @@ def k_index_robust(
         >>> assert 'k_spearman' in k_variants
     """
     if len(obs_norms) < 2 or len(act_norms) < 2:
-        return {
-            "k_pearson": np.nan,
-            "k_pearson_z": np.nan,
-            "k_spearman": np.nan
-        }
+        return {"k_pearson": np.nan, "k_pearson_z": np.nan, "k_spearman": np.nan}
 
     # 1. Standard Pearson K-Index
     k_p = k_index(obs_norms, act_norms)
@@ -99,11 +93,7 @@ def k_index_robust(
     rho, _ = spearmanr(obs_norms, act_norms)
     k_s = 2.0 * abs(rho)
 
-    return {
-        "k_pearson": k_p,
-        "k_pearson_z": k_pz,
-        "k_spearman": k_s
-    }
+    return {"k_pearson": k_p, "k_pearson_z": k_pz, "k_spearman": k_s}
 
 
 def k_index_with_ci(
@@ -111,7 +101,7 @@ def k_index_with_ci(
     act_norms: np.ndarray,
     n_bootstrap: int = 1000,
     alpha: float = 0.05,
-    rng: np.random.Generator = None
+    rng: np.random.Generator = None,
 ) -> Tuple[float, float, float]:
     """
     Compute K-Index with bootstrap confidence interval.
@@ -185,5 +175,5 @@ def verify_k_bounds(k_values: np.ndarray) -> Dict[str, Any]:
         "violations": violations.tolist() if len(violations) > 0 else [],
         "min": valid.min() if len(valid) > 0 else np.nan,
         "max": valid.max() if len(valid) > 0 else np.nan,
-        "mean": valid.mean() if len(valid) > 0 else np.nan
+        "mean": valid.mean() if len(valid) > 0 else np.nan,
     }

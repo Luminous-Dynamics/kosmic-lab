@@ -6,16 +6,13 @@ Compute K(τ) = 2|ρ(||O_t||, ||A_{t+τ}||)| across time lags τ.
 This verifies causal direction: observations → actions.
 Expected: peak at τ = 0, declining for τ < 0 and τ > 0.
 """
+
 import numpy as np
 from scipy.stats import pearsonr
 from typing import Any, Dict, Optional
 
 
-def k_lag(
-    obs_norms: np.ndarray,
-    act_norms: np.ndarray,
-    max_lag: int = 10
-) -> Dict[str, Any]:
+def k_lag(obs_norms: np.ndarray, act_norms: np.ndarray, max_lag: int = 10) -> Dict[str, Any]:
     """
     Compute K-Index across time lags.
 
@@ -40,12 +37,7 @@ def k_lag(
     """
     T = len(obs_norms)
     if T < max_lag + 2:
-        return {
-            "k_by_lag": {},
-            "peak_lag": np.nan,
-            "peak_k": np.nan,
-            "k_at_zero": np.nan
-        }
+        return {"k_by_lag": {}, "peak_lag": np.nan, "peak_k": np.nan, "k_at_zero": np.nan}
 
     k_by_lag = {}
 
@@ -83,7 +75,7 @@ def k_lag(
             "k_by_lag": k_by_lag,
             "peak_lag": np.nan,
             "peak_k": np.nan,
-            "k_at_zero": k_by_lag.get(0, np.nan)
+            "k_at_zero": k_by_lag.get(0, np.nan),
         }
 
     peak_lag = max(valid, key=valid.get)
@@ -93,7 +85,7 @@ def k_lag(
         "k_by_lag": k_by_lag,
         "peak_lag": peak_lag,
         "peak_k": peak_k,
-        "k_at_zero": k_by_lag.get(0, np.nan)
+        "k_at_zero": k_by_lag.get(0, np.nan),
     }
 
 
@@ -115,15 +107,12 @@ def verify_causal_direction(lag_result: Dict[str, Any]) -> Dict[str, Any]:
         >>> verify = verify_causal_direction(result)
         >>> assert verify['causal_direction_correct']
     """
-    peak_lag = lag_result['peak_lag']
-    k_at_zero = lag_result['k_at_zero']
-    peak_k = lag_result['peak_k']
+    peak_lag = lag_result["peak_lag"]
+    k_at_zero = lag_result["k_at_zero"]
+    peak_k = lag_result["peak_k"]
 
     if np.isnan(peak_lag):
-        return {
-            "causal_direction_correct": None,
-            "message": "Insufficient data for lag analysis"
-        }
+        return {"causal_direction_correct": None, "message": "Insufficient data for lag analysis"}
 
     # Check if peak is at τ ≥ 0
     correct = peak_lag >= 0
@@ -152,14 +141,12 @@ def verify_causal_direction(lag_result: Dict[str, Any]) -> Dict[str, Any]:
         "k_at_zero": k_at_zero,
         "peak_k": peak_k,
         "sync_to_peak_ratio": ratio,
-        "message": " | ".join(message)
+        "message": " | ".join(message),
     }
 
 
 def plot_k_lag(
-    lag_result: Dict[str, Any],
-    title: str = "K-Index vs Time Lag",
-    save_path: Optional[str] = None
+    lag_result: Dict[str, Any], title: str = "K-Index vs Time Lag", save_path: Optional[str] = None
 ):
     """
     Plot K-Index across time lags.
@@ -175,29 +162,28 @@ def plot_k_lag(
     """
     import matplotlib.pyplot as plt
 
-    k_by_lag = lag_result['k_by_lag']
-    peak_lag = lag_result['peak_lag']
+    k_by_lag = lag_result["k_by_lag"]
+    peak_lag = lag_result["peak_lag"]
 
     lags = sorted(k_by_lag.keys())
     k_values = [k_by_lag[tau] for tau in lags]
 
     plt.figure(figsize=(10, 6))
-    plt.plot(lags, k_values, 'o-', linewidth=2, markersize=6)
-    plt.axvline(0, color='gray', linestyle='--', alpha=0.5, label='τ=0 (synchronous)')
+    plt.plot(lags, k_values, "o-", linewidth=2, markersize=6)
+    plt.axvline(0, color="gray", linestyle="--", alpha=0.5, label="τ=0 (synchronous)")
 
     if not np.isnan(peak_lag):
-        plt.axvline(peak_lag, color='red', linestyle='--', alpha=0.7,
-                    label=f'Peak at τ={peak_lag}')
+        plt.axvline(peak_lag, color="red", linestyle="--", alpha=0.7, label=f"Peak at τ={peak_lag}")
 
-    plt.xlabel('Time Lag τ (steps)', fontsize=12)
-    plt.ylabel('K-Index = 2|ρ(||O_t||, ||A_{t+τ}||)|', fontsize=12)
+    plt.xlabel("Time Lag τ (steps)", fontsize=12)
+    plt.ylabel("K-Index = 2|ρ(||O_t||, ||A_{t+τ}||)|", fontsize=12)
     plt.title(title, fontsize=14)
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
         print(f"✅ Saved K-lag plot to {save_path}")
     else:
         plt.show()

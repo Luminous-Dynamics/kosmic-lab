@@ -3,6 +3,7 @@ Centralised configuration utilities.
 
 YAML loader that preserves ordering and hashes configs for K-passport tracking.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -87,7 +87,9 @@ class ReciprocityCoupler:
             for j, uid_j in enumerate(uids):
                 if i == j:
                     continue
-                reciprocity_sym[i, j] = (1 - symmetry_lambda) * reciprocity[i, j] + symmetry_lambda * reciprocity[j, i]
+                reciprocity_sym[i, j] = (1 - symmetry_lambda) * reciprocity[
+                    i, j
+                ] + symmetry_lambda * reciprocity[j, i]
 
         for j, uid_j in enumerate(uids):
             snap_j = self.snapshots[uid_j]
@@ -200,7 +202,9 @@ class ReciprocityCoupler:
 
     def _projected_diff(self, group: str, grad_i: np.ndarray, grad_j: np.ndarray) -> np.ndarray:
         if grad_i.shape != grad_j.shape:
-            raise ValueError(f"Gradient shapes differ for group '{group}' ({grad_i.shape} vs {grad_j.shape})")
+            raise ValueError(
+                f"Gradient shapes differ for group '{group}' ({grad_i.shape} vs {grad_j.shape})"
+            )
         # Future extensions (attention, low rank) hook here.
         return grad_i - grad_j
 

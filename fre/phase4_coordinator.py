@@ -60,7 +60,9 @@ class Phase4Coordinator:
         )
         self.buffer.push(exp)
 
-    def maybe_train(self) -> Tuple[Optional[float], Dict[int, Tuple[np.ndarray, np.ndarray, np.ndarray]]]:
+    def maybe_train(
+        self,
+    ) -> Tuple[Optional[float], Dict[int, Tuple[np.ndarray, np.ndarray, np.ndarray]]]:
         self.step_count += 1
         if len(self.buffer) < self.trainer_cfg.warmup_steps:
             return None, {}

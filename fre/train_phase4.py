@@ -15,7 +15,9 @@ from fre.simulate import _weights_from_config
 from harmonics_module import HarmonyCalculator
 
 
-def build_base_params(raw_params: Dict[str, float]) -> Tuple[Dict[str, float], Dict[str, Tuple[float, float]]]:
+def build_base_params(
+    raw_params: Dict[str, float],
+) -> Tuple[Dict[str, float], Dict[str, Tuple[float, float]]]:
     base_params: Dict[str, float] = {}
     bounds: Dict[str, Tuple[float, float]] = {}
     for key, value in raw_params.items():
@@ -67,12 +69,18 @@ def train(config_path: Path) -> None:
     records = []
     for t in range(total_steps):
         harmonies = simulator.step(t, weights)
-        mean_k = float(np.mean([scores.kosmic_signature(weights=weights) for scores in harmonies.values()]))
+        mean_k = float(
+            np.mean([scores.kosmic_signature(weights=weights) for scores in harmonies.values()])
+        )
         loss = simulator.phase4_last_loss
-        records.append({"step": t, "mean_K": mean_k, "critic_loss": loss if loss is not None else np.nan})
+        records.append(
+            {"step": t, "mean_K": mean_k, "critic_loss": loss if loss is not None else np.nan}
+        )
 
         if eval_interval and (t + 1) % eval_interval == 0:
-            print(f"Step {t+1}: mean K {mean_k:.4f}, critic loss {loss if loss is not None else float('nan'):.4f}")
+            print(
+                f"Step {t+1}: mean K {mean_k:.4f}, critic loss {loss if loss is not None else float('nan'):.4f}"
+            )
 
     df = pd.DataFrame(records)
     log_path = cfg.get("output", {}).get("training_log")

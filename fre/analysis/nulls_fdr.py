@@ -8,6 +8,7 @@ Generate null distributions for K-Index to establish statistical significance:
 
 Apply Benjamini-Hochberg FDR correction for multiple comparisons.
 """
+
 import numpy as np
 from scipy.stats import pearsonr
 from typing import Any, Dict, List, Optional, Tuple
@@ -17,7 +18,7 @@ def null_k_distributions(
     obs_norms: np.ndarray,
     act_norms: np.ndarray,
     n: int = 1000,
-    rng: Optional[np.random.Generator] = None
+    rng: Optional[np.random.Generator] = None,
 ) -> Dict[str, Any]:
     """
     Generate null distributions for K-Index.
@@ -97,14 +98,11 @@ def null_k_distributions(
         "p95_mag_matched": np.percentile(k_mag_matched, 95),
         "p99_shuffled": np.percentile(k_shuffled, 99),
         "p99_random": np.percentile(k_random, 99),
-        "p99_mag_matched": np.percentile(k_mag_matched, 99)
+        "p99_mag_matched": np.percentile(k_mag_matched, 99),
     }
 
 
-def verify_significance(
-    null_result: Dict[str, any],
-    alpha: float = 0.05
-) -> Dict[str, Any]:
+def verify_significance(null_result: Dict[str, any], alpha: float = 0.05) -> Dict[str, Any]:
     """
     Verify K-Index is significantly above null distributions.
 
@@ -120,10 +118,10 @@ def verify_significance(
         >>> verify = verify_significance(nulls)
         >>> assert verify['significant_all']
     """
-    k_emp = null_result['k_empirical']
-    p_shuf = null_result['p_shuffled']
-    p_rand = null_result['p_random']
-    p_mag = null_result['p_mag_matched']
+    k_emp = null_result["k_empirical"]
+    p_shuf = null_result["p_shuffled"]
+    p_rand = null_result["p_random"]
+    p_mag = null_result["p_mag_matched"]
 
     sig_shuf = p_shuf < alpha
     sig_rand = p_rand < alpha
@@ -151,19 +149,12 @@ def verify_significance(
         "significant_random": sig_rand,
         "significant_mag_matched": sig_mag,
         "significant_all": sig_all,
-        "p_values": {
-            "shuffled": p_shuf,
-            "random": p_rand,
-            "mag_matched": p_mag
-        },
-        "message": "\n".join(message)
+        "p_values": {"shuffled": p_shuf, "random": p_rand, "mag_matched": p_mag},
+        "message": "\n".join(message),
     }
 
 
-def pairwise_fdr(
-    conditions: Dict[str, np.ndarray],
-    alpha: float = 0.05
-) -> Dict[str, Any]:
+def pairwise_fdr(conditions: Dict[str, np.ndarray], alpha: float = 0.05) -> Dict[str, Any]:
     """
     Perform pairwise t-tests with Benjamini-Hochberg FDR correction.
 
@@ -209,7 +200,7 @@ def pairwise_fdr(
 
     # Benjamini-Hochberg FDR correction
     if len(p_values) > 0:
-        reject, p_fdr, _, _ = multipletests(p_values, alpha=alpha, method='fdr_bh')
+        reject, p_fdr, _, _ = multipletests(p_values, alpha=alpha, method="fdr_bh")
     else:
         reject = []
         p_fdr = []
@@ -221,31 +212,33 @@ def pairwise_fdr(
         mean2 = conditions[name2].mean()
         diff = mean2 - mean1
 
-        results.append({
-            "comparison": f"{name1} vs {name2}",
-            "mean_1": mean1,
-            "mean_2": mean2,
-            "difference": diff,
-            "p_raw": p_raw,
-            "p_fdr": p_adj,
-            "significant": bool(sig)
-        })
+        results.append(
+            {
+                "comparison": f"{name1} vs {name2}",
+                "mean_1": mean1,
+                "mean_2": mean2,
+                "difference": diff,
+                "p_raw": p_raw,
+                "p_fdr": p_adj,
+                "significant": bool(sig),
+            }
+        )
 
-    n_sig = sum(r['significant'] for r in results)
+    n_sig = sum(r["significant"] for r in results)
 
     return {
         "comparisons": results,
         "n_comparisons": len(comparisons),
         "n_significant": n_sig,
         "alpha": alpha,
-        "method": "Benjamini-Hochberg FDR"
+        "method": "Benjamini-Hochberg FDR",
     }
 
 
 def plot_null_distributions(
     null_result: Dict[str, any],
     title: str = "K-Index vs Null Distributions",
-    save_path: Optional[str] = None
+    save_path: Optional[str] = None,
 ):
     """
     Plot empirical K-Index vs null distributions.
@@ -261,43 +254,43 @@ def plot_null_distributions(
     """
     import matplotlib.pyplot as plt
 
-    k_emp = null_result['k_empirical']
-    k_shuf = null_result['null_shuffled']
-    k_rand = null_result['null_random']
-    k_mag = null_result['null_mag_matched']
+    k_emp = null_result["k_empirical"]
+    k_shuf = null_result["null_shuffled"]
+    k_rand = null_result["null_random"]
+    k_mag = null_result["null_mag_matched"]
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 
     # 1. Shuffled null
-    axes[0].hist(k_shuf, bins=30, alpha=0.7, color='blue', edgecolor='black')
-    axes[0].axvline(k_emp, color='red', linestyle='--', linewidth=2, label='Empirical')
-    axes[0].axvline(null_result['p95_shuffled'], color='orange', linestyle=':', label='95%')
-    axes[0].set_xlabel('K-Index')
-    axes[0].set_ylabel('Frequency')
-    axes[0].set_title('Shuffled Null')
+    axes[0].hist(k_shuf, bins=30, alpha=0.7, color="blue", edgecolor="black")
+    axes[0].axvline(k_emp, color="red", linestyle="--", linewidth=2, label="Empirical")
+    axes[0].axvline(null_result["p95_shuffled"], color="orange", linestyle=":", label="95%")
+    axes[0].set_xlabel("K-Index")
+    axes[0].set_ylabel("Frequency")
+    axes[0].set_title("Shuffled Null")
     axes[0].legend()
 
     # 2. Random null
-    axes[1].hist(k_rand, bins=30, alpha=0.7, color='green', edgecolor='black')
-    axes[1].axvline(k_emp, color='red', linestyle='--', linewidth=2, label='Empirical')
-    axes[1].axvline(null_result['p95_random'], color='orange', linestyle=':', label='95%')
-    axes[1].set_xlabel('K-Index')
-    axes[1].set_title('Random Null')
+    axes[1].hist(k_rand, bins=30, alpha=0.7, color="green", edgecolor="black")
+    axes[1].axvline(k_emp, color="red", linestyle="--", linewidth=2, label="Empirical")
+    axes[1].axvline(null_result["p95_random"], color="orange", linestyle=":", label="95%")
+    axes[1].set_xlabel("K-Index")
+    axes[1].set_title("Random Null")
     axes[1].legend()
 
     # 3. Magnitude-matched null
-    axes[2].hist(k_mag, bins=30, alpha=0.7, color='purple', edgecolor='black')
-    axes[2].axvline(k_emp, color='red', linestyle='--', linewidth=2, label='Empirical')
-    axes[2].axvline(null_result['p95_mag_matched'], color='orange', linestyle=':', label='95%')
-    axes[2].set_xlabel('K-Index')
-    axes[2].set_title('Magnitude-Matched Null')
+    axes[2].hist(k_mag, bins=30, alpha=0.7, color="purple", edgecolor="black")
+    axes[2].axvline(k_emp, color="red", linestyle="--", linewidth=2, label="Empirical")
+    axes[2].axvline(null_result["p95_mag_matched"], color="orange", linestyle=":", label="95%")
+    axes[2].set_xlabel("K-Index")
+    axes[2].set_title("Magnitude-Matched Null")
     axes[2].legend()
 
     plt.suptitle(title, fontsize=14)
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
         print(f"✅ Saved null distributions plot to {save_path}")
     else:
         plt.show()

@@ -1,4 +1,5 @@
 """Structured FRE Phase 1 simulation hooks."""
+
 from __future__ import annotations
 
 from itertools import product
@@ -139,7 +140,9 @@ def _synthetic_harmony_inputs(
     for _ in range(dead_agents):
         agent_states.append({"alive": False, "type": rng.choice(agent_types)})
 
-    te_matrix = rng.normal(loc=sim_metrics["te_mutual"], scale=0.05, size=(agent_count, agent_count))
+    te_matrix = rng.normal(
+        loc=sim_metrics["te_mutual"], scale=0.05, size=(agent_count, agent_count)
+    )
     te_matrix = np.clip(te_matrix, 0.0, None)
     np.fill_diagonal(te_matrix, 0.0)
 

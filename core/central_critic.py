@@ -46,5 +46,5 @@ class CentralCritic:
 
         self.weights -= self.config.learning_rate * grad_w
         self.bias -= self.config.learning_rate * grad_b
-        loss = float((td_error ** 2).mean())
+        loss = float((td_error**2).mean())
         return loss

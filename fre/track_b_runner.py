@@ -74,7 +74,9 @@ class TrackBRunner:
 
         self.control_params = list(self.control_config.get("parameters", {}).keys())
         if not self.control_params:
-            raise ValueError("Track B configuration must specify at least one controllable parameter.")
+            raise ValueError(
+                "Track B configuration must specify at least one controllable parameter."
+            )
 
         self.param_bounds = self._build_param_bounds()
         self.base_params = self._build_base_params()
@@ -222,7 +224,9 @@ class TrackBRunner:
             if mode == "open_loop":
                 raw_action = np.zeros_like(raw_action)
             elif step % self.action_interval == 0:
-                raw_action = np.asarray(self.controller.select_action(state.tolist(), evaluate=evaluate), dtype=float)
+                raw_action = np.asarray(
+                    self.controller.select_action(state.tolist(), evaluate=evaluate), dtype=float
+                )
 
             applied_deltas = self._apply_action(raw_action, current_params)
             next_metrics = compute_metrics(current_params, next_seed, self.simulator, self.weights)
@@ -396,7 +400,11 @@ class TrackBRunner:
 
     def _build_summary_payload(self, summaries: List[EpisodeSummary]) -> Dict[str, Any]:
         open_loop = [s for s in summaries if s.mode.startswith("open_loop")]
-        controller = [s for s in summaries if s.mode.startswith("controller_train") or s.mode.startswith("controller_eval")]
+        controller = [
+            s
+            for s in summaries
+            if s.mode.startswith("controller_train") or s.mode.startswith("controller_eval")
+        ]
 
         payload = {
             "control_config_sha": self.control_bundle.sha256,
@@ -407,10 +415,18 @@ class TrackBRunner:
                 "alpha": self.controller.alpha,
             },
             "aggregates": {
-                "open_loop_avg_k": float(np.mean([s.average_k for s in open_loop])) if open_loop else 0.0,
-                "controller_avg_k": float(np.mean([s.average_k for s in controller])) if controller else 0.0,
-                "open_loop_corridor": float(np.mean([s.corridor_rate for s in open_loop])) if open_loop else 0.0,
-                "controller_corridor": float(np.mean([s.corridor_rate for s in controller])) if controller else 0.0,
+                "open_loop_avg_k": (
+                    float(np.mean([s.average_k for s in open_loop])) if open_loop else 0.0
+                ),
+                "controller_avg_k": (
+                    float(np.mean([s.average_k for s in controller])) if controller else 0.0
+                ),
+                "open_loop_corridor": (
+                    float(np.mean([s.corridor_rate for s in open_loop])) if open_loop else 0.0
+                ),
+                "controller_corridor": (
+                    float(np.mean([s.corridor_rate for s in controller])) if controller else 0.0
+                ),
             },
         }
         return payload
@@ -460,7 +476,9 @@ def main() -> None:
     runner = TrackBRunner(args.config)
     summary = runner.run()
     runner.write_outputs(summary)
-    print(f"[Track B] Completed {len(summary['episodes'])} episodes. Summary stored at configured output path.")
+    print(
+        f"[Track B] Completed {len(summary['episodes'])} episodes. Summary stored at configured output path."
+    )
 
 
 if __name__ == "__main__":

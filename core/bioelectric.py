@@ -73,7 +73,9 @@ class BioelectricGrid:
 
         # V3 ATTRACTOR-BASED RESCUE: Leak pulls toward leak_reversal (default 0.0)
         # This creates a stable attractor that rescue can modify
-        self.V += self.dt * (self.D_map * lap - g_eff * (self.V - self.leak_reversal) + ion + stim + noise)
+        self.V += self.dt * (
+            self.D_map * lap - g_eff * (self.V - self.leak_reversal) + ion + stim + noise
+        )
         # CRITICAL FIX (2025-11-09): Use biological voltage scale (-100 to 0 mV)
         # Was: np.clip(self.V, -1.0, 1.0, out=self.V) - prevented hyperpolarization!
         np.clip(self.V, -100.0, 0.0, out=self.V)
@@ -87,7 +89,7 @@ class BioelectricGrid:
         yy, xx = self._grid_indices
         coords = np.argwhere(mask)
         dist2 = np.full(self.shape, np.inf, dtype=float)
-        for (y, x) in coords:
+        for y, x in coords:
             d2 = (yy - y) ** 2 + (xx - x) ** 2
             dist2 = np.minimum(dist2, d2)
 
@@ -106,10 +108,10 @@ class BioelectricGrid:
             return
         yy, xx = self._grid_indices
         coords = np.argwhere(mask)
-        for (y, x) in coords:
+        for y, x in coords:
             y0, y1 = max(0, y - radius), min(self.shape[0], y + radius + 1)
             x0, x1 = max(0, x - radius), min(self.shape[1], x + radius + 1)
-            self.D_map[y0:y1, x0:x1] *= (1.0 + rho)
+            self.D_map[y0:y1, x0:x1] *= 1.0 + rho
         np.clip(self.D_map, self.D_scalar * 0.5, self.D_scalar * 5.0, out=self.D_map)
 
     def anneal(self, gamma: float, steps: int) -> None:
@@ -129,11 +131,5 @@ class BioelectricGrid:
             )
         # default: Neumann (zero-flux) via edge padding
         pad = np.pad(A, 1, mode="edge")
-        lap = (
-            pad[:-2, 1:-1]
-            + pad[2:, 1:-1]
-            + pad[1:-1, :-2]
-            + pad[1:-1, 2:]
-            - 4.0 * A
-        )
+        lap = pad[:-2, 1:-1] + pad[2:, 1:-1] + pad[1:-1, :-2] + pad[1:-1, 2:] - 4.0 * A
         return lap

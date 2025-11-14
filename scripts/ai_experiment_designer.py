@@ -83,18 +83,18 @@ class AIExperimentDesigner:
         # Extract features and targets
         data = []
         for p in passports:
-            row = {'K': p['metrics']['K']}
+            row = {"K": p["metrics"]["K"]}
 
             # Extract parameters
-            if 'params' in p:
-                row.update(p['params'])
+            if "params" in p:
+                row.update(p["params"])
 
             data.append(row)
 
         self.training_data = pd.DataFrame(data)
 
         # Infer parameter names and bounds
-        self.param_names = [c for c in self.training_data.columns if c != 'K']
+        self.param_names = [c for c in self.training_data.columns if c != "K"]
         for param in self.param_names:
             values = self.training_data[param].values
             self.param_bounds[param] = (float(values.min()), float(values.max()))
@@ -116,25 +116,23 @@ class AIExperimentDesigner:
 
         # Prepare training data
         X = self.training_data[self.param_names].values
-        y = self.training_data['K'].values
+        y = self.training_data["K"].values
 
         # Kernel: RBF (smooth functions) + WhiteKernel (noise)
-        kernel = RBF(length_scale=0.1, length_scale_bounds=(1e-3, 1.0)) + \\
-                 WhiteKernel(noise_level=0.01)
+        kernel = RBF(length_scale=0.1, length_scale_bounds=(1e-3, 1.0)) + WhiteKernel(
+            noise_level=0.01
+        )
 
         # Train Gaussian Process
         self.model = GaussianProcessRegressor(
-            kernel=kernel,
-            n_restarts_optimizer=10,
-            random_state=42,
-            normalize_y=True
+            kernel=kernel, n_restarts_optimizer=10, random_state=42, normalize_y=True
         )
 
         self.model.fit(X, y)
 
         # Evaluate on training data
         y_pred, y_std = self.model.predict(X, return_std=True)
-        r2 = 1 - np.sum((y - y_pred)**2) / np.sum((y - y.mean())**2)
+        r2 = 1 - np.sum((y - y_pred) ** 2) / np.sum((y - y.mean()) ** 2)
 
         print(f"✓ Model trained!")
         print(f"  R² score: {r2:.3f}")
@@ -144,7 +142,7 @@ class AIExperimentDesigner:
         self,
         n_suggestions: int,
         target_k: float = 1.5,
-        strategy: str = "ucb"  # Upper Confidence Bound
+        strategy: str = "ucb",  # Upper Confidence Bound
     ) -> List[ExperimentSuggestion]:
         """
         Generate experiment suggestions using Bayesian optimization.
@@ -174,7 +172,7 @@ class AIExperimentDesigner:
             scores = k_pred + kappa * k_std
         elif strategy == "ei":
             # Expected Improvement over current best
-            current_best = self.training_data['K'].max()
+            current_best = self.training_data["K"].max()
             scores = self._expected_improvement(k_pred, k_std, current_best)
         elif strategy == "pi":
             # Probability of Improvement over target
@@ -186,8 +184,7 @@ class AIExperimentDesigner:
         top_indices = np.argsort(scores)[-n_suggestions:][::-1]
 
         for rank, idx in enumerate(top_indices, 1):
-            params = {name: float(candidates[idx, i])
-                      for i, name in enumerate(self.param_names)}
+            params = {name: float(candidates[idx, i]) for i, name in enumerate(self.param_names)}
 
             suggestion = ExperimentSuggestion(
                 params=params,
@@ -195,9 +192,7 @@ class AIExperimentDesigner:
                 uncertainty=float(k_std[idx]),
                 expected_information_gain=float(k_std[idx]),
                 priority_score=float(scores[idx]),
-                rationale=self._generate_rationale(
-                    params, k_pred[idx], k_std[idx], rank, target_k
-                )
+                rationale=self._generate_rationale(params, k_pred[idx], k_std[idx], rank, target_k),
             )
 
             suggestions.append(suggestion)
@@ -246,7 +241,7 @@ class AIExperimentDesigner:
         predicted_k: float,
         uncertainty: float,
         rank: int,
-        target_k: float
+        target_k: float,
     ) -> str:
         """Generate human-readable rationale for suggestion."""
         distance_to_target = abs(predicted_k - target_k)
@@ -266,24 +261,27 @@ class AIExperimentDesigner:
     def save_model(self, path: Path) -> None:
         """Save trained model to disk."""
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open('wb') as f:
-            pickle.dump({
-                'model': self.model,
-                'param_names': self.param_names,
-                'param_bounds': self.param_bounds,
-                'training_data': self.training_data
-            }, f)
+        with path.open("wb") as f:
+            pickle.dump(
+                {
+                    "model": self.model,
+                    "param_names": self.param_names,
+                    "param_bounds": self.param_bounds,
+                    "training_data": self.training_data,
+                },
+                f,
+            )
         print(f"✅ Model saved: {path}")
 
     def load_model(self, path: Path) -> None:
         """Load trained model from disk."""
-        with path.open('rb') as f:
+        with path.open("rb") as f:
             data = pickle.load(f)
 
-        self.model = data['model']
-        self.param_names = data['param_names']
-        self.param_bounds = data['param_bounds']
-        self.training_data = data['training_data']
+        self.model = data["model"]
+        self.param_names = data["param_names"]
+        self.param_bounds = data["param_bounds"]
+        self.training_data = data["training_data"]
 
         print(f"✅ Model loaded: {path}")
 
@@ -295,47 +293,40 @@ class AIExperimentDesigner:
 
         for i, sug in enumerate(suggestions):
             exp = {
-                'experiment_id': f"ai_suggested_{i+1:03d}",
-                'parameters': sug.params,
-                'predicted_k': float(sug.predicted_k),
-                'uncertainty': float(sug.uncertainty),
-                'priority': float(sug.priority_score),
-                'rationale': sug.rationale
+                "experiment_id": f"ai_suggested_{i+1:03d}",
+                "parameters": sug.params,
+                "predicted_k": float(sug.predicted_k),
+                "uncertainty": float(sug.uncertainty),
+                "priority": float(sug.priority_score),
+                "rationale": sug.rationale,
             }
             experiments.append(exp)
 
         config = {
-            'ai_generated': True,
-            'generated_at': pd.Timestamp.now().isoformat(),
-            'n_experiments': len(experiments),
-            'experiments': experiments
+            "ai_generated": True,
+            "generated_at": pd.Timestamp.now().isoformat(),
+            "n_experiments": len(experiments),
+            "experiments": experiments,
         }
 
         output.parent.mkdir(parents=True, exist_ok=True)
-        with output.open('w') as f:
+        with output.open("w") as f:
             yaml.dump(config, f, default_flow_style=False, sort_keys=False)
 
         print(f"✅ Suggestions exported: {output}")
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="AI-Assisted Experiment Designer"
-    )
+    parser = argparse.ArgumentParser(description="AI-Assisted Experiment Designer")
 
-    parser.add_argument("--train", type=Path,
-                        help="Train on K-passports in this directory")
-    parser.add_argument("--model", type=Path, required=True,
-                        help="Model path (save/load)")
-    parser.add_argument("--suggest", type=int,
-                        help="Number of experiments to suggest")
-    parser.add_argument("--target-k", type=float, default=1.5,
-                        help="Target K-index value")
-    parser.add_argument("--strategy", default="ucb",
-                        choices=["ucb", "ei", "pi"],
-                        help="Suggestion strategy")
-    parser.add_argument("--output", type=Path,
-                        help="Output YAML file for suggestions")
+    parser.add_argument("--train", type=Path, help="Train on K-passports in this directory")
+    parser.add_argument("--model", type=Path, required=True, help="Model path (save/load)")
+    parser.add_argument("--suggest", type=int, help="Number of experiments to suggest")
+    parser.add_argument("--target-k", type=float, default=1.5, help="Target K-index value")
+    parser.add_argument(
+        "--strategy", default="ucb", choices=["ucb", "ei", "pi"], help="Suggestion strategy"
+    )
+    parser.add_argument("--output", type=Path, help="Output YAML file for suggestions")
 
     args = parser.parse_args()
 
@@ -356,14 +347,12 @@ def main():
 
         designer.load_model(args.model)
         suggestions = designer.suggest_experiments(
-            args.suggest,
-            target_k=args.target_k,
-            strategy=args.strategy
+            args.suggest, target_k=args.target_k, strategy=args.strategy
         )
 
         print(f"\\n{'='*60}")
         print("TOP EXPERIMENT SUGGESTIONS")
-        print('='*60)
+        print("=" * 60)
 
         for i, sug in enumerate(suggestions, 1):
             print(f"\\n#{i}: {sug.rationale}")

@@ -21,8 +21,12 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=Path("configs/track_c_sac.yaml"))
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--episodes", type=int, default=5)
-    parser.add_argument("--lesion-scale", type=float, default=None, help="Scale factor for lesion radius")
-    parser.add_argument("--lesion-count", type=int, default=None, help="Number of lesions to introduce")
+    parser.add_argument(
+        "--lesion-scale", type=float, default=None, help="Scale factor for lesion radius"
+    )
+    parser.add_argument(
+        "--lesion-count", type=int, default=None, help="Number of lesions to introduce"
+    )
     args = parser.parse_args()
 
     cfg = load_config(args.config)

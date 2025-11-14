@@ -8,11 +8,10 @@ These tests verify:
 4. Monotonicity with correlation strength
 5. Robust variants produce similar results
 """
+
 import numpy as np
 import pytest
-from fre.metrics.k_index import (
-    k_index, k_index_robust, k_index_with_ci, verify_k_bounds
-)
+from fre.metrics.k_index import k_index, k_index_robust, k_index_with_ci, verify_k_bounds
 
 
 def test_k_bounds_perfect_correlation():
@@ -63,7 +62,7 @@ def test_k_monotonicity():
 
     # Check monotonicity
     for i in range(len(k_values) - 1):
-        assert k_values[i] <= k_values[i+1] + 0.1, (
+        assert k_values[i] <= k_values[i + 1] + 0.1, (
             f"K-Index should increase with correlation: "
             f"K[{i}]={k_values[i]:.3f} > K[{i+1}]={k_values[i+1]:.3f}"
         )
@@ -91,9 +90,9 @@ def test_k_robust_variants_consistency():
 
     k_variants = k_index_robust(obs, act)
 
-    k_p = k_variants['k_pearson']
-    k_pz = k_variants['k_pearson_z']
-    k_s = k_variants['k_spearman']
+    k_p = k_variants["k_pearson"]
+    k_pz = k_variants["k_pearson_z"]
+    k_s = k_variants["k_spearman"]
 
     # All should be in bounds
     assert 0.0 <= k_p <= 2.0, f"k_pearson out of bounds: {k_p}"
@@ -101,14 +100,14 @@ def test_k_robust_variants_consistency():
     assert 0.0 <= k_s <= 2.0, f"k_spearman out of bounds: {k_s}"
 
     # Pearson and z-scored Pearson should be very similar
-    assert abs(k_p - k_pz) < 0.1, (
-        f"Pearson and z-scored Pearson should be similar: {k_p:.3f} vs {k_pz:.3f}"
-    )
+    assert (
+        abs(k_p - k_pz) < 0.1
+    ), f"Pearson and z-scored Pearson should be similar: {k_p:.3f} vs {k_pz:.3f}"
 
     # Spearman should be reasonably close (rank-based)
-    assert abs(k_p - k_s) < 0.3, (
-        f"Pearson and Spearman should be reasonably close: {k_p:.3f} vs {k_s:.3f}"
-    )
+    assert (
+        abs(k_p - k_s) < 0.3
+    ), f"Pearson and Spearman should be reasonably close: {k_p:.3f} vs {k_s:.3f}"
 
 
 def test_k_confidence_interval():
@@ -120,9 +119,9 @@ def test_k_confidence_interval():
     k_est, k_low, k_high = k_index_with_ci(obs, act, n_bootstrap=100, rng=rng)
 
     # Check ordering
-    assert k_low <= k_est <= k_high, (
-        f"CI should contain estimate: [{k_low:.3f}, {k_high:.3f}] vs {k_est:.3f}"
-    )
+    assert (
+        k_low <= k_est <= k_high
+    ), f"CI should contain estimate: [{k_low:.3f}, {k_high:.3f}] vs {k_est:.3f}"
 
     # Check all in bounds
     assert 0.0 <= k_low <= 2.0, f"k_lower out of bounds: {k_low}"
@@ -158,13 +157,13 @@ def test_verify_k_bounds_all_valid():
 
     result = verify_k_bounds(k_values)
 
-    assert result['all_valid'], "All K-Index values should be valid"
-    assert result['total'] == 6
-    assert result['valid'] == 6
-    assert result['nan'] == 0
-    assert len(result['violations']) == 0
-    assert 0.0 <= result['min'] <= 2.0
-    assert 0.0 <= result['max'] <= 2.0
+    assert result["all_valid"], "All K-Index values should be valid"
+    assert result["total"] == 6
+    assert result["valid"] == 6
+    assert result["nan"] == 0
+    assert len(result["violations"]) == 0
+    assert 0.0 <= result["min"] <= 2.0
+    assert 0.0 <= result["max"] <= 2.0
 
 
 def test_verify_k_bounds_with_violations():
@@ -174,10 +173,10 @@ def test_verify_k_bounds_with_violations():
 
     result = verify_k_bounds(k_values)
 
-    assert not result['all_valid'], "Should detect violations"
-    assert len(result['violations']) == 2, "Should detect 2 violations"
-    assert 2.5 in result['violations']
-    assert -0.1 in result['violations']
+    assert not result["all_valid"], "Should detect violations"
+    assert len(result["violations"]) == 2, "Should detect 2 violations"
+    assert 2.5 in result["violations"]
+    assert -0.1 in result["violations"]
 
 
 def test_verify_k_bounds_with_nan():
@@ -186,10 +185,10 @@ def test_verify_k_bounds_with_nan():
 
     result = verify_k_bounds(k_values)
 
-    assert result['total'] == 5
-    assert result['valid'] == 3
-    assert result['nan'] == 2
-    assert result['all_valid'], "NaN values should not count as violations"
+    assert result["total"] == 5
+    assert result["valid"] == 3
+    assert result["nan"] == 2
+    assert result["all_valid"], "NaN values should not count as violations"
 
 
 def test_k_scale_invariance():

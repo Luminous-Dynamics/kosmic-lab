@@ -21,6 +21,7 @@ Backwards Compatibility:
 
 See K_CODEX_MIGRATION.md for complete migration guide.
 """
+
 from __future__ import annotations
 
 import json
@@ -301,7 +302,7 @@ class KCodexWriter:
 
 # Type alias for backwards compatibility
 KPassport = Dict[str, Any]  # Local JSON record (pre-publication)
-KCodex = Dict[str, Any]      # Same structure, but conceptually eternal once published
+KCodex = Dict[str, Any]  # Same structure, but conceptually eternal once published
 
 # Class aliases for backwards compatibility
 KPassportWriter = KCodexWriter

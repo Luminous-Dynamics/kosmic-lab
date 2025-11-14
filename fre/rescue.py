@@ -43,7 +43,7 @@ def fep_to_bioelectric(agent, timestep: int) -> None:
         return
 
     # Initialize momentum if first time
-    if not hasattr(agent, '_voltage_momentum'):
+    if not hasattr(agent, "_voltage_momentum"):
         agent._voltage_momentum = 0.0
 
     # Pull voltage toward resting potential (-70mV) with stronger correction
@@ -63,7 +63,7 @@ def fep_to_bioelectric(agent, timestep: int) -> None:
         agent.gap_junctions[neighbor_id] *= 1.1
 
 
-def fep_to_bioelectric_v3(agent, grid: 'BioelectricGrid', timestep: int) -> None:
+def fep_to_bioelectric_v3(agent, grid: "BioelectricGrid", timestep: int) -> None:
     """V3: Attractor-based rescue - modifies grid physics to create stable equilibria.
 
     KEY INSIGHT FROM V2 FAILURE:
@@ -90,7 +90,7 @@ def fep_to_bioelectric_v3(agent, grid: 'BioelectricGrid', timestep: int) -> None
 
     # Modify leak reversal to create stable attractor at target
     # Gradually shift leak reversal toward target (smooth transition)
-    if not hasattr(agent, '_leak_reversal_momentum'):
+    if not hasattr(agent, "_leak_reversal_momentum"):
         agent._leak_reversal_momentum = 0.0
 
     # Optimal shift rate from v3 (validation showed 0.6 is worse)
@@ -101,7 +101,7 @@ def fep_to_bioelectric_v3(agent, grid: 'BioelectricGrid', timestep: int) -> None
 
     # Also temporarily increase leak conductance to accelerate convergence
     # Store original if first time
-    if not hasattr(grid, '_original_g'):
+    if not hasattr(grid, "_original_g"):
         grid._original_g = grid.g
 
     # Increase leak proportional to error (higher error = faster convergence)
@@ -114,7 +114,7 @@ def fep_to_bioelectric_v3(agent, grid: 'BioelectricGrid', timestep: int) -> None
         agent.gap_junctions[neighbor_id] *= 1.1
 
 
-def fep_to_bioelectric_v4_adaptive(agent, grid: 'BioelectricGrid', timestep: int) -> None:
+def fep_to_bioelectric_v4_adaptive(agent, grid: "BioelectricGrid", timestep: int) -> None:
     """V4: Adaptive target voltage - matches intervention strength to damage severity.
 
     INSIGHT FROM VALIDATION TEST:
@@ -150,7 +150,7 @@ def fep_to_bioelectric_v4_adaptive(agent, grid: 'BioelectricGrid', timestep: int
 
     # Modify leak reversal to create stable attractor at adaptive target
     # Gradually shift leak reversal toward target (smooth transition)
-    if not hasattr(agent, '_leak_reversal_momentum'):
+    if not hasattr(agent, "_leak_reversal_momentum"):
         agent._leak_reversal_momentum = 0.0
 
     # Use v3's optimal shift rate (validation showed 0.3 is best)
@@ -161,7 +161,7 @@ def fep_to_bioelectric_v4_adaptive(agent, grid: 'BioelectricGrid', timestep: int
 
     # Also temporarily increase leak conductance to accelerate convergence
     # Store original if first time
-    if not hasattr(grid, '_original_g'):
+    if not hasattr(grid, "_original_g"):
         grid._original_g = grid.g
 
     # Increase leak proportional to error (higher error = faster convergence)
@@ -181,7 +181,7 @@ def bioelectric_to_autopoiesis(agent, target_morphology: Dict[str, float]) -> No
     to allow autopoiesis activation during rescue process.
     """
     target_voltage = target_morphology.get("voltage", -70.0)
-    
+
     # Relaxed threshold: Allow activation when voltage is moving toward target
     if abs(agent.voltage - target_voltage) >= 20.0:
         return

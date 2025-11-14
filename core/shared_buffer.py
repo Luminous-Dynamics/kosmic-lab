@@ -65,7 +65,9 @@ class SharedReplayBuffer:
             if self.position == 0:
                 self.full = True
 
-    def sample(self, batch_size: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def sample(
+        self, batch_size: int
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         with self.lock:
             current_size = len(self)
             if batch_size > current_size:

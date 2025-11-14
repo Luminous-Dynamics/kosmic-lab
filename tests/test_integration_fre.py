@@ -1,4 +1,5 @@
 """Comprehensive Integration Tests for FRE Pipeline"""
+
 from __future__ import annotations
 
 import json
@@ -30,7 +31,7 @@ class TestFREIntegration:
         result1 = sim.run(params, seed=42)
         result2 = sim.run(params, seed=42)
 
-        assert result1['K'] == result2['K']
+        assert result1["K"] == result2["K"]
 
     def test_k_index_bounds(self):
         """K-index always within [0, 2.5]."""
@@ -40,4 +41,4 @@ class TestFREIntegration:
         for _ in range(100):
             params = {"energy_gradient": rng.uniform(0, 1)}
             result = sim.run(params, seed=rng.integers(0, 10000))
-            assert 0 <= result['K'] <= 2.5
+            assert 0 <= result["K"] <= 2.5

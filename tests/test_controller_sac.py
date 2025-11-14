@@ -33,7 +33,9 @@ def test_replay_buffer_sampling() -> None:
 
 def test_sac_select_action_shape_and_bounds() -> None:
     torch.manual_seed(0)
-    controller = SACController(action_dim=2, state_dim=3, hidden_layers=(32, 32), buffer_capacity=256)
+    controller = SACController(
+        action_dim=2, state_dim=3, hidden_layers=(32, 32), buffer_capacity=256
+    )
     state = [0.1, -0.2, 0.3]
     action = controller.select_action(state, evaluate=False)
     assert len(action) == 2
@@ -48,7 +50,9 @@ def test_sac_update_returns_metrics() -> None:
     torch.manual_seed(0)
     np.random.seed(0)
     random.seed(0)
-    controller = SACController(action_dim=1, state_dim=4, hidden_layers=(32, 32), buffer_capacity=512)
+    controller = SACController(
+        action_dim=1, state_dim=4, hidden_layers=(32, 32), buffer_capacity=512
+    )
 
     for _ in range(64):
         noise = np.random.randn(4).astype(np.float32)

@@ -37,7 +37,9 @@ class KosmicRescueEnv(gym.Env):
     def __init__(self, config: EnvConfig | None = None) -> None:
         super().__init__()
         self.cfg = config or EnvConfig()
-        self.grid = BioelectricGrid(self.cfg.shape, D=self.cfg.diffusion, g=self.cfg.leak, dt=self.cfg.dt)
+        self.grid = BioelectricGrid(
+            self.cfg.shape, D=self.cfg.diffusion, g=self.cfg.leak, dt=self.cfg.dt
+        )
         self.target_mask = self._make_target_mask()
         self.state_mask = np.zeros(self.cfg.shape, dtype=bool)
         self.current_iou = 0.0
@@ -50,7 +52,9 @@ class KosmicRescueEnv(gym.Env):
     def reset(self, *, seed: Optional[int] = None, options: Optional[Dict] = None):
         super().reset(seed=seed)
         rng = np.random.default_rng(seed)
-        self.grid = BioelectricGrid(self.cfg.shape, D=self.cfg.diffusion, g=self.cfg.leak, dt=self.cfg.dt)
+        self.grid = BioelectricGrid(
+            self.cfg.shape, D=self.cfg.diffusion, g=self.cfg.leak, dt=self.cfg.dt
+        )
         self.grid.V.fill(0.0)
         lesion = self._make_lesion_mask(rng)
         self.grid.V = lesion.astype(float) * 0.5
@@ -76,7 +80,7 @@ class KosmicRescueEnv(gym.Env):
 
         perimeter = np.logical_and(self.target_mask, ~self.state_mask)
         I = self.grid.stimulate(perimeter, stim_amp, stim_radius)
-        energy_cost = float((I ** 2).mean())
+        energy_cost = float((I**2).mean())
         self.grid.step(I_stim=I)
         self.state_mask = mask_from_voltage(self.grid.V, self.cfg.threshold)
         self.prev_iou = self.current_iou
@@ -109,7 +113,7 @@ class KosmicRescueEnv(gym.Env):
         center = np.array([self.cfg.shape[0] // 2, self.cfg.shape[1] // 2]) + shift
         base_radius = max(2, int((self.cfg.shape[0] // 5) * self.cfg.lesion_radius_scale))
         for _ in range(max(1, self.cfg.lesion_count)):
-            lesion = (xx - center[1]) ** 2 + (yy - center[0]) ** 2 <= base_radius ** 2
+            lesion = (xx - center[1]) ** 2 + (yy - center[0]) ** 2 <= base_radius**2
             mask[lesion] = False
             # randomise next lesion centre slightly for multi-lesion scenarios
             center = center + rng.integers(-4, 4, size=2)

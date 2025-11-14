@@ -12,7 +12,14 @@ def make_exp(val: float, state_dim: int = 3, action_dim: int = 2) -> Experience:
     state = np.full(state_dim, val, dtype=np.float32)
     next_state = state + 0.1
     action = np.full(action_dim, val * 0.5, dtype=np.float32)
-    return Experience(state=state, action=action, reward=float(val), next_state=next_state, done=False, universe_id=int(val))
+    return Experience(
+        state=state,
+        action=action,
+        reward=float(val),
+        next_state=next_state,
+        done=False,
+        universe_id=int(val),
+    )
 
 
 def test_push_and_len() -> None:

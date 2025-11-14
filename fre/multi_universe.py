@@ -163,7 +163,11 @@ class MultiUniverseSimulator:
             uid = uni.uid
             harmonies[uid] = scores
 
-            if self.coupling_mode == "te" and self.driver_history is not None and self.driven_history is not None:
+            if (
+                self.coupling_mode == "te"
+                and self.driver_history is not None
+                and self.driven_history is not None
+            ):
                 driver_value = np.array(
                     [scores.resonant_coherence, scores.infinite_play], dtype=float
                 )
@@ -222,14 +226,20 @@ class MultiUniverseSimulator:
                     action_vec = np.zeros(2, dtype=float)
 
                 params = {
-                    "energy_gradient": np.array([uni.params.get("energy_gradient", 0.0)], dtype=float),
-                    "plasticity_rate": np.array([uni.params.get("plasticity_rate", 0.0)], dtype=float),
+                    "energy_gradient": np.array(
+                        [uni.params.get("energy_gradient", 0.0)], dtype=float
+                    ),
+                    "plasticity_rate": np.array(
+                        [uni.params.get("plasticity_rate", 0.0)], dtype=float
+                    ),
                 }
                 grads = {
                     # ΔK plus lagged change to capture acceleration in coherence
                     "energy_gradient": np.array([grad_vec[5] + lagged_grad[5]], dtype=float),
                     # Combine Δcohesion, Δplayfulness, Δte_symmetry to reflect structural shifts
-                    "plasticity_rate": np.array([grad_vec[0] + grad_vec[2] + grad_vec[4]], dtype=float),
+                    "plasticity_rate": np.array(
+                        [grad_vec[0] + grad_vec[2] + grad_vec[4]], dtype=float
+                    ),
                 }
                 if action_vec is not None:
                     grads["policy_action"] = action_vec.copy()
@@ -245,7 +255,12 @@ class MultiUniverseSimulator:
                 uni.last_snapshot = snapshot
 
                 current_k = float(scores.kosmic_signature(weights=weights))
-                if self.phase4 and prev_state is not None and prev_action is not None and prev_k is not None:
+                if (
+                    self.phase4
+                    and prev_state is not None
+                    and prev_action is not None
+                    and prev_k is not None
+                ):
                     reward = current_k - prev_k
                     self.phase4.record_transition(
                         state=prev_state,
@@ -345,7 +360,11 @@ class MultiUniverseSimulator:
                     self.phase4_last_loss = loss
                     self.phase4_loss_log.append((timestep, loss))
                 if actor_batches:
-                    for uid, (states_batch, actions_batch, advantages_batch) in actor_batches.items():
+                    for uid, (
+                        states_batch,
+                        actions_batch,
+                        advantages_batch,
+                    ) in actor_batches.items():
                         idx = self.uid_to_index.get(f"U{uid}") if isinstance(uid, int) else None
                         if idx is None and isinstance(uid, str):
                             idx = self.uid_to_index.get(uid)
@@ -384,17 +403,24 @@ class MultiUniverseSimulator:
             for row in rows:
                 writer.writerow(row)
 
-    def _build_policy_observation(self, uni: UniverseState, metrics: Dict[str, float], scores: HarmonyScores) -> np.ndarray:
+    def _build_policy_observation(
+        self, uni: UniverseState, metrics: Dict[str, float], scores: HarmonyScores
+    ) -> np.ndarray:
         coherence = float(np.clip(scores.resonant_coherence, -1.0, 1.0))
         last_coherence = getattr(uni, "last_coherence", None)
-        delta = 0.0 if last_coherence is None else coherence - float(np.clip(last_coherence, -1.0, 1.0))
+        delta = (
+            0.0 if last_coherence is None else coherence - float(np.clip(last_coherence, -1.0, 1.0))
+        )
         cohesion = float(np.clip(metrics.get("cohesion", 0.5), 0.0, 1.0))
         energy_metric = float(np.clip(1.0 - cohesion, 0.0, 1.0))
-        obs = np.array([
-            coherence,
-            np.clip(delta, -1.0, 1.0),
-            np.clip(2.0 * energy_metric - 1.0, -1.0, 1.0),
-        ], dtype=np.float32)
+        obs = np.array(
+            [
+                coherence,
+                np.clip(delta, -1.0, 1.0),
+                np.clip(2.0 * energy_metric - 1.0, -1.0, 1.0),
+            ],
+            dtype=np.float32,
+        )
         uni.last_coherence = coherence
         return obs
 
@@ -492,7 +518,9 @@ class MultiUniverseSimulator:
             {"alive": True, "type": rng.choice(["explorer", "cooperator", "mediator"])}
             for _ in range(alive_count)
         ]
-        agent_states += [{"alive": False, "type": "defector"} for _ in range(agent_count - alive_count)]
+        agent_states += [
+            {"alive": False, "type": "defector"} for _ in range(agent_count - alive_count)
+        ]
 
         te_matrix = rng.normal(
             loc=sim_metrics.get("te_mutual", 0.5),
@@ -509,8 +537,7 @@ class MultiUniverseSimulator:
         }
 
         behavioral_history = [
-            rng.normal(loc=0.0, scale=0.5 + playfulness, size=(agent_count, 3))
-            for _ in range(15)
+            rng.normal(loc=0.0, scale=0.5 + playfulness, size=(agent_count, 3)) for _ in range(15)
         ]
 
         return {

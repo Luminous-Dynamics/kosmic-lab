@@ -15,9 +15,7 @@ from historical_k.etl import build_harmony_frame, compute_k_series
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Compute Historical K(t) from configured proxies."
-    )
+    parser = argparse.ArgumentParser(description="Compute Historical K(t) from configured proxies.")
     parser.add_argument(
         "--config",
         type=Path,
@@ -67,7 +65,9 @@ def _bootstrap_mean_ci(k_series, cfg: Dict[str, Any]) -> tuple[float, float]:
 
     rng = np.random.default_rng(cfg.get("seed", 0))
     data = k_series.to_numpy()
-    resampled_means = [float(rng.choice(data, size=data.size, replace=True).mean()) for _ in range(samples)]
+    resampled_means = [
+        float(rng.choice(data, size=data.size, replace=True).mean()) for _ in range(samples)
+    ]
     alpha = 1 - float(cfg.get("ci", 0.95))
     lower = float(np.percentile(resampled_means, 100 * (alpha / 2)))
     upper = float(np.percentile(resampled_means, 100 * (1 - alpha / 2)))

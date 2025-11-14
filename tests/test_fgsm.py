@@ -6,6 +6,7 @@ These tests verify:
 2. Perturbation magnitude is bounded by epsilon
 3. Gradient computation is correct
 """
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -15,13 +16,10 @@ from fre.attacks.fgsm import fgsm_observation, sanity_check_loss_increases, fgsm
 
 class SimplePolicy(nn.Module):
     """Simple policy network for testing."""
+
     def __init__(self, obs_dim=4, act_dim=2):
         super().__init__()
-        self.fc = nn.Sequential(
-            nn.Linear(obs_dim, 32),
-            nn.ReLU(),
-            nn.Linear(32, act_dim)
-        )
+        self.fc = nn.Sequential(nn.Linear(obs_dim, 32), nn.ReLU(), nn.Linear(32, act_dim))
 
     def forward(self, x):
         return self.fc(x)
@@ -40,9 +38,9 @@ def test_fgsm_increases_loss():
     base_loss, adv_loss = sanity_check_loss_increases(model, obs, target, loss_fn, eps)
 
     # Verify adversarial loss >= base loss
-    assert adv_loss >= base_loss - 1e-6, (
-        f"FGSM should increase task loss, but adv={adv_loss:.4f} < base={base_loss:.4f}"
-    )
+    assert (
+        adv_loss >= base_loss - 1e-6
+    ), f"FGSM should increase task loss, but adv={adv_loss:.4f} < base={base_loss:.4f}"
 
 
 def test_fgsm_perturbation_magnitude():
@@ -61,9 +59,7 @@ def test_fgsm_perturbation_magnitude():
     delta = (adv_obs - obs).abs()
     max_delta = delta.max().item()
 
-    assert max_delta <= eps + 1e-6, (
-        f"Perturbation magnitude {max_delta:.6f} exceeds epsilon {eps}"
-    )
+    assert max_delta <= eps + 1e-6, f"Perturbation magnitude {max_delta:.6f} exceeds epsilon {eps}"
 
 
 def test_fgsm_gradient_direction():
@@ -92,9 +88,9 @@ def test_fgsm_gradient_direction():
     # Allow small numerical errors
     alignment = ((delta.sign() == expected_delta.sign()).float().mean()).item()
 
-    assert alignment >= 0.99, (
-        f"FGSM perturbation should align with gradient sign, but only {alignment*100:.1f}% match"
-    )
+    assert (
+        alignment >= 0.99
+    ), f"FGSM perturbation should align with gradient sign, but only {alignment*100:.1f}% match"
 
 
 def test_fgsm_batch_with_verify():
@@ -125,9 +121,7 @@ def test_fgsm_zero_epsilon():
     adv_obs = fgsm_observation(model, obs, target, loss_fn, eps)
 
     # Check no perturbation
-    assert torch.allclose(adv_obs, obs, atol=1e-6), (
-        "Epsilon=0 should produce no perturbation"
-    )
+    assert torch.allclose(adv_obs, obs, atol=1e-6), "Epsilon=0 should produce no perturbation"
 
 
 def test_fgsm_deterministic():
@@ -146,9 +140,7 @@ def test_fgsm_deterministic():
     adv_obs_2 = fgsm_observation(model, obs, target, loss_fn, eps)
 
     # Check determinism
-    assert torch.allclose(adv_obs_1, adv_obs_2, atol=1e-6), (
-        "FGSM should be deterministic"
-    )
+    assert torch.allclose(adv_obs_1, adv_obs_2, atol=1e-6), "FGSM should be deterministic"
 
 
 def test_fgsm_different_epsilon():

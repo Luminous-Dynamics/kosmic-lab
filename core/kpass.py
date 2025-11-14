@@ -1,6 +1,7 @@
 """
 Utilities for writing K-passport telemetry compliant with the JSON schema.
 """
+
 from __future__ import annotations
 
 import json

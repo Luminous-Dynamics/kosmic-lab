@@ -18,9 +18,7 @@ from fre.corridor import (
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Aggregate FRE Phase 1 runs from K-passport logs."
-    )
+    parser = argparse.ArgumentParser(description="Aggregate FRE Phase 1 runs from K-passport logs.")
     parser.add_argument(
         "--logdir",
         type=Path,
@@ -82,7 +80,9 @@ def load_passports(logdir: Path) -> pd.DataFrame:
     return pd.DataFrame(records)
 
 
-def compute_summary(df: pd.DataFrame, param_columns: List[str], threshold: float) -> CorridorSummary:
+def compute_summary(
+    df: pd.DataFrame, param_columns: List[str], threshold: float
+) -> CorridorSummary:
     """
     Compute corridor metrics from experiment data.
 

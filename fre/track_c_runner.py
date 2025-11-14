@@ -35,6 +35,7 @@ from fre.detailed_logging_patch import (
 @dataclass
 class AgentState:
     """Simplified agent for rescue experiments."""
+
     voltage: float = -70.0
     boundary_integrity: float = 1.0
     internal_state: Dict[str, float] = None
@@ -53,6 +54,7 @@ class AgentState:
 @dataclass
 class EpisodeSummary:
     """Results from a single rescue episode."""
+
     mode: str
     initial_iou: float
     final_iou: float
@@ -117,7 +119,7 @@ class TrackCRunner:
         center = np.array(self.grid_shape) / 2
         radius = min(self.grid_shape) / 4
 
-        dist = np.sqrt((y - center[0])**2 + (x - center[1])**2)
+        dist = np.sqrt((y - center[0]) ** 2 + (x - center[1]) ** 2)
         return dist <= radius
 
     def _create_damaged_morphology(self, seed: int) -> np.ndarray:
@@ -138,12 +140,7 @@ class TrackCRunner:
         self.grid.V += np.random.normal(0, 5.0, self.grid_shape)
         np.clip(self.grid.V, -100, 0, out=self.grid.V)
 
-    def run_episode(
-        self,
-        mode: str,
-        seed: int,
-        rescue_enabled: bool = True
-    ) -> EpisodeSummary:
+    def run_episode(self, mode: str, seed: int, rescue_enabled: bool = True) -> EpisodeSummary:
         """Run a single rescue episode."""
         # Initialize damaged morphology
         damaged_mask = self._create_damaged_morphology(seed)
@@ -199,17 +196,19 @@ class TrackCRunner:
 
             # Record diagnostics
             iou_history.append(current_iou)
-            self.diagnostics.append({
-                "mode": mode,
-                "seed": seed,
-                "timestep": t,
-                "iou": current_iou,
-                "voltage": agent.voltage,
-                "boundary_integrity": agent.boundary_integrity,
-                "atp": agent.internal_state["ATP"],
-                "rescue_triggers_cumulative": rescue_triggers,
-                "prediction_error": agent.prediction_errors["sensory"],
-            })
+            self.diagnostics.append(
+                {
+                    "mode": mode,
+                    "seed": seed,
+                    "timestep": t,
+                    "iou": current_iou,
+                    "voltage": agent.voltage,
+                    "boundary_integrity": agent.boundary_integrity,
+                    "atp": agent.internal_state["ATP"],
+                    "rescue_triggers_cumulative": rescue_triggers,
+                    "prediction_error": agent.prediction_errors["sensory"],
+                }
+            )
 
             # Add detailed logging if enabled
             if self.enable_detailed:
@@ -290,8 +289,10 @@ class TrackCRunner:
         rescue_episodes = [ep for ep in results["episodes"] if ep["mode"] == "rescue"]
 
         results["aggregates"] = {
-            "no_rescue_success_rate": sum(ep["success"] for ep in no_rescue_episodes) / len(no_rescue_episodes),
-            "rescue_success_rate": sum(ep["success"] for ep in rescue_episodes) / len(rescue_episodes),
+            "no_rescue_success_rate": sum(ep["success"] for ep in no_rescue_episodes)
+            / len(no_rescue_episodes),
+            "rescue_success_rate": sum(ep["success"] for ep in rescue_episodes)
+            / len(rescue_episodes),
             "no_rescue_avg_final_iou": np.mean([ep["final_iou"] for ep in no_rescue_episodes]),
             "rescue_avg_final_iou": np.mean([ep["final_iou"] for ep in rescue_episodes]),
             "avg_rescue_triggers": np.mean([ep["rescue_triggers"] for ep in rescue_episodes]),
@@ -325,6 +326,7 @@ class TrackCRunner:
 
         # Save diagnostics CSV
         import pandas as pd
+
         diagnostics_df = pd.DataFrame(self.diagnostics)
         diagnostics_path = output_dir / "fre_track_c_diagnostics.csv"
         diagnostics_df.to_csv(diagnostics_path, index=False)

@@ -21,7 +21,9 @@ class Phase4Actor:
         self.cfg = config
         rng = np.random.default_rng(seed)
         limit = 1.0 / np.sqrt(config.state_dim)
-        self.weights = rng.uniform(-limit, limit, size=(config.state_dim, config.action_dim)).astype(np.float32)
+        self.weights = rng.uniform(
+            -limit, limit, size=(config.state_dim, config.action_dim)
+        ).astype(np.float32)
         self.bias = np.zeros(config.action_dim, dtype=np.float32)
 
     def predict(self, state: np.ndarray) -> np.ndarray:

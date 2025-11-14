@@ -1,4 +1,5 @@
 """Stage-1 Track A gating analysis for FRE corridor sweeps."""
+
 from __future__ import annotations
 
 import json
@@ -36,7 +37,11 @@ def jaccard(a: set[Tuple], b: set[Tuple]) -> float:
 def compute_gate_metrics(df: pd.DataFrame, gate_sizes: List[int]) -> pd.DataFrame:
     param_cols = [c for c in df.columns if c.startswith("param_")]
     if not param_cols:
-        param_cols = [c for c in df.columns if c in {"energy_gradient", "communication_cost", "plasticity_rate"}]
+        param_cols = [
+            c
+            for c in df.columns
+            if c in {"energy_gradient", "communication_cost", "plasticity_rate"}
+        ]
 
     df["param_tuple"] = df[param_cols].apply(lambda r: tuple(np.round(r.values, 6)), axis=1)
     full_corridor = set(df.loc[df["in_corridor"] > 0.0, "param_tuple"].tolist())

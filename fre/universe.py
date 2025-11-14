@@ -7,7 +7,7 @@ import numpy as np
 
 
 def _gaussian_closeness(value: float, center: float, width: float) -> float:
-    return float(np.exp(-((value - center) ** 2) / (2 * width ** 2)))
+    return float(np.exp(-((value - center) ** 2) / (2 * width**2)))
 
 
 @dataclass
@@ -37,14 +37,16 @@ class UniverseSimulator:
     def run(self, params: Dict[str, float], seed: int) -> Dict[str, float]:
         rng = np.random.default_rng(seed)
         closeness = {
-            key: _gaussian_closeness(
-                float(params.get(key, center)), center, self.widths[key]
-            )
+            key: _gaussian_closeness(float(params.get(key, center)), center, self.widths[key])
             for key, center in self.centers.items()
         }
 
         cohesion = np.mean(
-            [closeness["energy_gradient"], closeness["communication_cost"], closeness["plasticity_rate"]]
+            [
+                closeness["energy_gradient"],
+                closeness["communication_cost"],
+                closeness["plasticity_rate"],
+            ]
         )
         reciprocity = closeness["noise_spectrum_alpha"]
         playfulness = closeness["stimulus_jitter"]

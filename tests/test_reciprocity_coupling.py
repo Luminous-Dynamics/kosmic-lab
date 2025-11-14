@@ -58,8 +58,12 @@ def test_energy_gate_blocks_updates() -> None:
 def test_mismatched_shapes_raise_error() -> None:
     cfg = CouplerConfig(window=5)
     coupler = ReciprocityCoupler(cfg)
-    snap1 = PolicySnapshot(params={"actor": np.zeros((2,))}, grads={"actor": np.ones((2,))}, energy=0.0)
-    snap2 = PolicySnapshot(params={"actor": np.zeros((3,))}, grads={"actor": np.ones((3,))}, energy=0.0)
+    snap1 = PolicySnapshot(
+        params={"actor": np.zeros((2,))}, grads={"actor": np.ones((2,))}, energy=0.0
+    )
+    snap2 = PolicySnapshot(
+        params={"actor": np.zeros((3,))}, grads={"actor": np.ones((3,))}, energy=0.0
+    )
     coupler.register_universe("X", snap1)
     coupler.register_universe("Y", snap2)
     coupler.update_snapshot("X", snap1)

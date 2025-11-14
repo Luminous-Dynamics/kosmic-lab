@@ -7,15 +7,14 @@ Compute partial correlation controlling for reward:
 This proves K-Index measures intrinsic coherence, not just task optimization.
 Expected: k_partial ≈ k_raw (reward doesn't explain the correlation)
 """
+
 import numpy as np
 from scipy.stats import pearsonr
 from typing import Any, Dict
 
 
 def k_partial_reward(
-    obs_norms: np.ndarray,
-    act_norms: np.ndarray,
-    rewards: np.ndarray
+    obs_norms: np.ndarray, act_norms: np.ndarray, rewards: np.ndarray
 ) -> Dict[str, float]:
     """
     Compute K-Index with partial correlation controlling for reward.
@@ -49,13 +48,13 @@ def k_partial_reward(
             "k_partial": np.nan,
             "delta": np.nan,
             "r_obs_rew": np.nan,
-            "r_act_rew": np.nan
+            "r_act_rew": np.nan,
         }
 
     # Raw correlations
     r_oa, _ = pearsonr(obs_norms, act_norms)  # ρ(O, A)
-    r_or, _ = pearsonr(obs_norms, rewards)    # ρ(O, R)
-    r_ar, _ = pearsonr(act_norms, rewards)    # ρ(A, R)
+    r_or, _ = pearsonr(obs_norms, rewards)  # ρ(O, R)
+    r_ar, _ = pearsonr(act_norms, rewards)  # ρ(A, R)
 
     # K-Index (raw, no control)
     k_raw = 2.0 * abs(r_oa)
@@ -82,13 +81,12 @@ def k_partial_reward(
         "r_obs_rew": r_or,
         "r_act_rew": r_ar,
         "r_obs_act": r_oa,
-        "r_partial": r_partial
+        "r_partial": r_partial,
     }
 
 
 def verify_reward_independence(
-    partial_result: Dict[str, float],
-    threshold: float = 0.1
+    partial_result: Dict[str, float], threshold: float = 0.1
 ) -> Dict[str, Any]:
     """
     Verify K-Index is independent of reward (k_partial ≈ k_raw).
@@ -105,14 +103,14 @@ def verify_reward_independence(
         >>> verify = verify_reward_independence(result)
         >>> assert verify['reward_independent']
     """
-    k_raw = partial_result['k_raw']
-    k_partial = partial_result['k_partial']
-    delta = partial_result['delta']
+    k_raw = partial_result["k_raw"]
+    k_partial = partial_result["k_partial"]
+    delta = partial_result["delta"]
 
     if np.isnan(delta):
         return {
             "reward_independent": None,
-            "message": "Cannot compute partial correlation (insufficient data or degenerate case)"
+            "message": "Cannot compute partial correlation (insufficient data or degenerate case)",
         }
 
     independent = abs(delta) < threshold
@@ -126,25 +124,24 @@ def verify_reward_independence(
         message.append(f"   k_raw={k_raw:.3f}, k_partial={k_partial:.3f}")
 
     # Additional context
-    r_or = partial_result['r_obs_rew']
-    r_ar = partial_result['r_act_rew']
+    r_or = partial_result["r_obs_rew"]
+    r_ar = partial_result["r_act_rew"]
     if abs(r_or) > 0.5 or abs(r_ar) > 0.5:
-        message.append(f"⚠️ High reward correlation detected: "
-                      f"ρ(O,R)={r_or:.3f}, ρ(A,R)={r_ar:.3f}")
+        message.append(
+            f"⚠️ High reward correlation detected: " f"ρ(O,R)={r_or:.3f}, ρ(A,R)={r_ar:.3f}"
+        )
 
     return {
         "reward_independent": independent,
         "delta": delta,
         "k_raw": k_raw,
         "k_partial": k_partial,
-        "message": "\n".join(message)
+        "message": "\n".join(message),
     }
 
 
 def k_partial_multi(
-    obs_norms: np.ndarray,
-    act_norms: np.ndarray,
-    controls: Dict[str, np.ndarray]
+    obs_norms: np.ndarray, act_norms: np.ndarray, controls: Dict[str, np.ndarray]
 ) -> Dict[str, float]:
     """
     Compute K-Index controlling for multiple confounds.
@@ -173,11 +170,7 @@ def k_partial_multi(
     from sklearn.linear_model import LinearRegression
 
     if len(obs_norms) < len(controls) + 2:
-        return {
-            "k_raw": np.nan,
-            "k_controlled": np.nan,
-            "delta": np.nan
-        }
+        return {"k_raw": np.nan, "k_controlled": np.nan, "delta": np.nan}
 
     # Stack control variables
     X = np.column_stack([v for v in controls.values()])
@@ -204,5 +197,5 @@ def k_partial_multi(
         "k_raw": k_raw,
         "k_controlled": k_controlled,
         "delta": k_raw - k_controlled,
-        "controls": list(controls.keys())
+        "controls": list(controls.keys()),
     }

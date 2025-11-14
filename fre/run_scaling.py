@@ -59,16 +59,20 @@ def run_scaling(config_path: Path) -> pd.DataFrame:
         if simulator.phase4_loss_log:
             avg_loss = float(np.mean([loss for _, loss in simulator.phase4_loss_log]))
             last_step, last_loss = simulator.phase4_loss_log[-1]
-            print(f"Phase4 critic loss (avg): {avg_loss:.4f}, last step {last_step} loss {last_loss:.4f}")
+            print(
+                f"Phase4 critic loss (avg): {avg_loss:.4f}, last step {last_step} loss {last_loss:.4f}"
+            )
         mean_k = []
         for hist in histories.values():
             k_vals = [scores.kosmic_signature(weights=weights) for scores in hist]
             mean_k.append(float(np.mean(k_vals)))
-        rows.append({
-            "universe_count": count,
-            "mean_K": float(np.mean(mean_k)),
-            "sum_K": float(np.sum(mean_k)),
-        })
+        rows.append(
+            {
+                "universe_count": count,
+                "mean_K": float(np.mean(mean_k)),
+                "sum_K": float(np.sum(mean_k)),
+            }
+        )
 
     return pd.DataFrame(rows)
 

@@ -92,7 +92,9 @@ class SACController:
         critic_params = list(self.critic_1.parameters()) + list(self.critic_2.parameters())
         self.critic_opt = optim.Adam(critic_params, lr=critic_lr)
 
-        self.log_alpha = torch.tensor(np.log(init_temperature), device=self.device, requires_grad=True)
+        self.log_alpha = torch.tensor(
+            np.log(init_temperature), device=self.device, requires_grad=True
+        )
         self.alpha_opt = optim.Adam([self.log_alpha], lr=alpha_lr)
         self.actor_clip_norm = float(actor_clip_norm) if actor_clip_norm is not None else None
         self.critic_clip_norm = float(critic_clip_norm) if critic_clip_norm is not None else None
@@ -112,10 +114,18 @@ class SACController:
 
         batch = self.replay_buffer.sample(batch_size)
         states = torch.as_tensor([t.state for t in batch], dtype=torch.float32, device=self.device)
-        actions = torch.as_tensor([t.action for t in batch], dtype=torch.float32, device=self.device)
-        rewards = torch.as_tensor([t.reward for t in batch], dtype=torch.float32, device=self.device).unsqueeze(-1)
-        next_states = torch.as_tensor([t.next_state for t in batch], dtype=torch.float32, device=self.device)
-        dones = torch.as_tensor([float(t.done) for t in batch], dtype=torch.float32, device=self.device).unsqueeze(-1)
+        actions = torch.as_tensor(
+            [t.action for t in batch], dtype=torch.float32, device=self.device
+        )
+        rewards = torch.as_tensor(
+            [t.reward for t in batch], dtype=torch.float32, device=self.device
+        ).unsqueeze(-1)
+        next_states = torch.as_tensor(
+            [t.next_state for t in batch], dtype=torch.float32, device=self.device
+        )
+        dones = torch.as_tensor(
+            [float(t.done) for t in batch], dtype=torch.float32, device=self.device
+        ).unsqueeze(-1)
 
         with torch.no_grad():
             next_action, next_log_prob, _ = self.actor.sample(next_states)
@@ -127,12 +137,18 @@ class SACController:
         # critic update
         current_q1 = self.critic_1(states, actions)
         current_q2 = self.critic_2(states, actions)
-        critic_loss = nn.functional.mse_loss(current_q1, target_value) + nn.functional.mse_loss(current_q2, target_value)
+        critic_loss = nn.functional.mse_loss(current_q1, target_value) + nn.functional.mse_loss(
+            current_q2, target_value
+        )
         self.critic_opt.zero_grad(set_to_none=True)
         critic_loss.backward()
         if self.critic_clip_norm is not None and self.critic_clip_norm > 0.0:
-            torch.nn.utils.clip_grad_norm_(self.critic_1.parameters(), max_norm=self.critic_clip_norm)
-            torch.nn.utils.clip_grad_norm_(self.critic_2.parameters(), max_norm=self.critic_clip_norm)
+            torch.nn.utils.clip_grad_norm_(
+                self.critic_1.parameters(), max_norm=self.critic_clip_norm
+            )
+            torch.nn.utils.clip_grad_norm_(
+                self.critic_2.parameters(), max_norm=self.critic_clip_norm
+            )
         self.critic_opt.step()
 
         # actor update

@@ -5,6 +5,7 @@ Provides lightweight ETL helpers that look for proxy CSV files under
 historical_k/data/. When files are absent, deterministic fallback series are
 generated so the pipeline remains reproducible.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
