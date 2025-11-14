@@ -8,14 +8,14 @@ Expected: peak at τ = 0, declining for τ < 0 and τ > 0.
 """
 import numpy as np
 from scipy.stats import pearsonr
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 
 def k_lag(
     obs_norms: np.ndarray,
     act_norms: np.ndarray,
     max_lag: int = 10
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Compute K-Index across time lags.
 
@@ -97,7 +97,7 @@ def k_lag(
     }
 
 
-def verify_causal_direction(lag_result: Dict[str, any]) -> Dict[str, any]:
+def verify_causal_direction(lag_result: Dict[str, Any]) -> Dict[str, Any]:
     """
     Verify that peak K-Index occurs at τ ≥ 0.
 
@@ -157,7 +157,7 @@ def verify_causal_direction(lag_result: Dict[str, any]) -> Dict[str, any]:
 
 
 def plot_k_lag(
-    lag_result: Dict[str, any],
+    lag_result: Dict[str, Any],
     title: str = "K-Index vs Time Lag",
     save_path: Optional[str] = None
 ):

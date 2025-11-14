@@ -36,6 +36,17 @@ class CorridorSummary:
 
 
 def compute_corridor_metrics(df: pd.DataFrame, threshold: float, param_columns: List[str]) -> CorridorSummary:
+    """
+    Compute summary statistics for corridor analysis.
+
+    Args:
+        df: DataFrame containing experiment results with 'in_corridor' and metric columns
+        threshold: K-index threshold used to define corridor membership (for reference)
+        param_columns: List of parameter column names to analyze
+
+    Returns:
+        CorridorSummary with statistics including hit rate, mean metrics, centroid, and bounds
+    """
     total = len(df)
     corridor_df = df[df["in_corridor"]]
     hits = len(corridor_df)
@@ -56,6 +67,17 @@ def compute_corridor_metrics(df: pd.DataFrame, threshold: float, param_columns: 
 
 
 def discretize_corridor(df: pd.DataFrame, param_columns: List[str], bins: int = 12) -> List[Tuple[int, ...]]:
+    """
+    Discretize parameter space into grid cells for coverage analysis.
+
+    Args:
+        df: DataFrame containing parameter values
+        param_columns: List of parameter column names to discretize
+        bins: Number of bins per parameter dimension (default: 12)
+
+    Returns:
+        List of tuples, each representing the grid cell coordinates for a data point
+    """
     if df.empty:
         return []
     grids = []
@@ -72,6 +94,26 @@ def compare_to_baseline(
     param_columns: List[str],
     bins: int = 12,
 ) -> Dict[str, float]:
+    """
+    Compare current corridor coverage to a baseline dataset.
+
+    Args:
+        current_df: DataFrame with current experiment results
+        baseline_path: Path to baseline CSV file containing reference corridor data
+        param_columns: List of parameter column names to compare
+        bins: Number of bins per dimension for grid discretization (default: 12)
+
+    Returns:
+        Dictionary with coverage metrics:
+        - baseline_volume: Number of unique grid cells in baseline
+        - current_volume: Number of unique grid cells in current data
+        - overlap: Number of shared grid cells
+        - jaccard: Jaccard similarity coefficient (overlap / union)
+        - recall: Fraction of baseline cells recovered in current data
+
+    Raises:
+        FileNotFoundError: If baseline file does not exist
+    """
     if not baseline_path.exists():
         raise FileNotFoundError(f"Baseline file not found: {baseline_path}")
     baseline_df = pd.read_csv(baseline_path)
@@ -138,6 +180,14 @@ def compare_to_baseline(
 
 
 def save_summary(summary: CorridorSummary, path: Path, extra: Dict[str, object] | None = None) -> None:
+    """
+    Save corridor summary statistics to a JSON file.
+
+    Args:
+        summary: CorridorSummary object with computed metrics
+        path: Destination file path for JSON output
+        extra: Optional dictionary of additional data to include in the output
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     data = summary.to_dict()
     if extra:

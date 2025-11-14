@@ -38,3 +38,23 @@ incremental/
 # OS-specific
 .DS_Store
 Thumbs.db
+
+# Security - sensitive files and credentials
+*.pem
+*.key
+*.env
+*.env.*
+!*.env.example
+credentials.json
+config.ini
+secrets/
+.secrets/
+*.cert
+*.crt
+*.pfx
+*.p12
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.ssh

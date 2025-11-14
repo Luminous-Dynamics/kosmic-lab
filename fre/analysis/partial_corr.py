@@ -9,7 +9,7 @@ Expected: k_partial ≈ k_raw (reward doesn't explain the correlation)
 """
 import numpy as np
 from scipy.stats import pearsonr
-from typing import Dict
+from typing import Any, Dict
 
 
 def k_partial_reward(
@@ -89,7 +89,7 @@ def k_partial_reward(
 def verify_reward_independence(
     partial_result: Dict[str, float],
     threshold: float = 0.1
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Verify K-Index is independent of reward (k_partial ≈ k_raw).
 

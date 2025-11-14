@@ -47,6 +47,19 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_passports(logdir: Path) -> pd.DataFrame:
+    """
+    Load K-passport JSON files from a directory into a DataFrame.
+
+    Args:
+        logdir: Path to directory containing passport JSON files
+
+    Returns:
+        DataFrame with columns for run_id, seed, metrics (K, TAT, Recovery),
+        in_corridor flag, and all parameter values (prefixed with 'param_')
+
+    Raises:
+        FileNotFoundError: If no JSON files are found in the directory
+    """
     records: List[Dict] = []
     for path in sorted(logdir.glob("*.json")):
         with path.open("r", encoding="utf-8") as fh:
@@ -70,10 +83,31 @@ def load_passports(logdir: Path) -> pd.DataFrame:
 
 
 def compute_summary(df: pd.DataFrame, param_columns: List[str], threshold: float) -> CorridorSummary:
+    """
+    Compute corridor metrics from experiment data.
+
+    Args:
+        df: DataFrame containing experiment results
+        param_columns: List of parameter column names to include in analysis
+        threshold: K-index threshold for corridor inclusion
+
+    Returns:
+        CorridorSummary with computed metrics and statistics
+    """
     return compute_corridor_metrics(df, threshold=threshold, param_columns=param_columns)
 
 
 def create_plots(df: pd.DataFrame, param_columns: List[str], outdir: Path) -> None:
+    """
+    Generate and save visualization plots for experiment results.
+
+    Creates histogram of K-index distribution and parameter space plots.
+
+    Args:
+        df: DataFrame containing experiment results with K-index values
+        param_columns: List of parameter column names to visualize
+        outdir: Directory path where plots will be saved
+    """
     outdir.mkdir(parents=True, exist_ok=True)
     plt.figure(figsize=(6, 4))
     sns.histplot(df["K"], kde=True)

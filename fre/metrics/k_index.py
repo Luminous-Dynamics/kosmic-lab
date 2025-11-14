@@ -12,7 +12,7 @@ Bounds: K ∈ [0, 2]
 """
 import numpy as np
 from scipy.stats import pearsonr, spearmanr
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 
 def k_index(obs_norms: np.ndarray, act_norms: np.ndarray) -> float:
@@ -157,7 +157,7 @@ def k_index_with_ci(
     return k_estimate, k_lower, k_upper
 
 
-def verify_k_bounds(k_values: np.ndarray) -> Dict[str, any]:
+def verify_k_bounds(k_values: np.ndarray) -> Dict[str, Any]:
     """
     Verify all K-Index values are within [0, 2] bounds.
 

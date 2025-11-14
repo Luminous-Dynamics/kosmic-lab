@@ -10,10 +10,6 @@ from fre.universe import UniverseSimulator
 from harmonics_module import HarmonyCalculator
 
 
-CALCULATOR = HarmonyCalculator()
-GLOBAL_TIMESTEP = 0
-
-
 DEFAULT_SEED_BASE = 44
 
 
@@ -31,14 +27,17 @@ def simulate_phase1(config: Dict[str, Any]) -> List[Dict[str, Any]]:
     seed_base = int(config.get("seed_base", DEFAULT_SEED_BASE))
     threshold = float(config.get("corridor_threshold", 1.0))
     simulator = UniverseSimulator()
+    calculator = HarmonyCalculator()
     weights = _weights_from_config(config.get("k_weights", {}))
 
     seeds_per_point = int(config.get("seeds_per_point", 1))
     results: List[Dict[str, Any]] = []
+    timestep = 0
     for idx, params in enumerate(param_grid):
         for offset in range(seeds_per_point):
             seed = seed_base + idx * max(1, seeds_per_point) + offset
-            metrics = compute_metrics(params, seed, simulator, weights)
+            metrics = compute_metrics(params, seed, simulator, weights, calculator, timestep)
+            timestep += 1
             metrics["in_corridor"] = metrics["K"] >= threshold
             results.append(
                 {
@@ -78,15 +77,29 @@ def compute_metrics(
     seed: int,
     simulator: UniverseSimulator | None = None,
     weights: np.ndarray | None = None,
+    calculator: HarmonyCalculator | None = None,
+    timestep: int = 0,
 ) -> Dict[str, float]:
-    """Compute harmonies and derived metrics for a parameter set."""
-    global GLOBAL_TIMESTEP
+    """
+    Compute harmonies and derived metrics for a parameter set.
 
+    Args:
+        params: Parameter dictionary for the simulation
+        seed: Random seed for reproducibility
+        simulator: Optional UniverseSimulator instance
+        weights: Optional weights for K-index calculation
+        calculator: Optional HarmonyCalculator instance
+        timestep: Current timestep counter
+
+    Returns:
+        Dictionary of computed metrics including K-index and harmony scores
+    """
     simulator = simulator or UniverseSimulator()
+    calculator = calculator or HarmonyCalculator()
+
     sim_metrics = simulator.run(params, seed)
-    GLOBAL_TIMESTEP += 1
-    harmony_inputs = _synthetic_harmony_inputs(sim_metrics, params, seed, GLOBAL_TIMESTEP)
-    scores = CALCULATOR.compute_all(**harmony_inputs)
+    harmony_inputs = _synthetic_harmony_inputs(sim_metrics, params, seed, timestep)
+    scores = calculator.compute_all(**harmony_inputs)
     weights = weights if weights is not None else np.ones(7) / 7.0
     k_value = float(np.clip(scores.kosmic_signature(weights=weights) * 1.2, 0.0, 2.5))
 

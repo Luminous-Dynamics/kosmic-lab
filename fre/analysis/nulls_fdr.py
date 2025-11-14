@@ -10,7 +10,7 @@ Apply Benjamini-Hochberg FDR correction for multiple comparisons.
 """
 import numpy as np
 from scipy.stats import pearsonr
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 
 def null_k_distributions(
@@ -18,7 +18,7 @@ def null_k_distributions(
     act_norms: np.ndarray,
     n: int = 1000,
     rng: Optional[np.random.Generator] = None
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Generate null distributions for K-Index.
 
@@ -104,7 +104,7 @@ def null_k_distributions(
 def verify_significance(
     null_result: Dict[str, any],
     alpha: float = 0.05
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Verify K-Index is significantly above null distributions.
 
@@ -163,7 +163,7 @@ def verify_significance(
 def pairwise_fdr(
     conditions: Dict[str, np.ndarray],
     alpha: float = 0.05
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Perform pairwise t-tests with Benjamini-Hochberg FDR correction.
 
