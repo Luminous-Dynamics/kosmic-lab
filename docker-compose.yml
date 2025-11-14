@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # Main Kosmic Lab application
+  kosmic-lab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kosmic-lab:latest
+    container_name: kosmic-lab
+    volumes:
+      # Mount data and logs for persistence
+      - ./data:/data
+      - ./logs:/logs
+      # Mount configs for easy modification
+      - ./configs:/app/configs:ro
+    ports:
+      # Dashboard
+      - "8050:8050"
+    environment:
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "echo '🌊 Kosmic Lab Starting...' &&
+             python examples/01_hello_kosmic.py &&
+             echo '✅ Example completed! Run dashboard:' &&
+             echo '   docker-compose run kosmic-lab make dashboard'"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import core; import fre"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Optional: Dashboard service
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kosmic-lab:latest
+    container_name: kosmic-dashboard
+    volumes:
+      - ./logs:/logs:ro
+    ports:
+      - "8050:8050"
+    environment:
+      - LOG_LEVEL=INFO
+    command: ["python", "scripts/kosmic_dashboard.py", "--logdir", "/logs", "--port", "8050"]
+    profiles:
+      - dashboard
+
+  # Optional: Holochain node (for Mycelix integration)
+  holochain:
+    image: holochain/holochain:latest
+    container_name: kosmic-holochain
+    volumes:
+      - ./holochain:/holochain
+      - holochain-data:/data
+    ports:
+      - "8888:8888"
+    environment:
+      - RUST_LOG=info
+    profiles:
+      - mycelix
+
+volumes:
+  holochain-data:
+    driver: local
+
+networks:
+  default:
+    name: kosmic-network

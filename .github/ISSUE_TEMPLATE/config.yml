@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/Luminous-Dynamics/kosmic-lab/discussions
+    about: Ask questions, share ideas, or discuss consciousness research
+  - name: 📚 Documentation
+    url: https://github.com/Luminous-Dynamics/kosmic-lab/blob/main/README.md
+    about: Read the comprehensive documentation
+  - name: 🏗️ Architecture Guide
+    url: https://github.com/Luminous-Dynamics/kosmic-lab/blob/main/ARCHITECTURE.md
+    about: Understand the system architecture
+  - name: 🌊 Mycelix Integration
+    url: https://github.com/Luminous-Dynamics/kosmic-lab/blob/main/docs/MYCELIX_INTEGRATION_ARCHITECTURE.md
+    about: Learn about decentralized storage integration
