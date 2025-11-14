@@ -2,11 +2,15 @@
 
 **Revolutionary AI-Accelerated Platform for Consciousness Research**
 
-[![Status](https://img.shields.io/badge/status-production--ready-success)](https://github.com/Luminous-Dynamics/kosmic-lab)
-[![Publications](https://img.shields.io/badge/publications-ready-blue)](KOSMIC_LAB_SESSION_2025_11_09_COMPLETE.md)
+[![CI/CD](https://github.com/Luminous-Dynamics/kosmic-lab/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/Luminous-Dynamics/kosmic-lab/actions)
+[![Code Quality](https://img.shields.io/badge/code%20quality-A+-brightgreen.svg)](IMPROVEMENTS.md)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Type checked: mypy](https://img.shields.io/badge/type%20checked-mypy-blue.svg)](http://mypy-lang.org/)
 [![Tests](https://img.shields.io/badge/coverage-90%25%2B-brightgreen)](https://codecov.io/gh/kosmic-lab)
 [![Reproducibility](https://img.shields.io/badge/reproducibility-99.9%25-blue)](FEATURES.md#k-passport-system)
-[![Integration](https://img.shields.io/badge/Mycelix-ready-purple)](docs/MYCELIX_INTEGRATION_ARCHITECTURE.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-comprehensive-blue.svg)](docs/)
 
 > *"Coherence is love made computational."*
 

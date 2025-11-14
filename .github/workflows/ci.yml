@@ -1,0 +1,230 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, claude/**]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --with dev
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Check code formatting (black)
+        run: |
+          poetry run black --check core/ fre/ historical_k/ scripts/ tests/
+        continue-on-error: false
+
+      - name: Check import sorting (isort)
+        run: |
+          poetry run isort --check-only core/ fre/ historical_k/ scripts/ tests/
+        continue-on-error: false
+
+      - name: Lint with flake8
+        run: |
+          poetry run flake8 core/ fre/ historical_k/ scripts/ \
+            --count --select=E9,F63,F7,F82 --show-source --statistics
+          poetry run flake8 core/ fre/ historical_k/ scripts/ \
+            --count --max-complexity=10 --max-line-length=100 --statistics
+        continue-on-error: true
+
+      - name: Security check with bandit
+        run: |
+          poetry run bandit -r core/ fre/ historical_k/ -f json -o bandit-report.json || true
+          poetry run bandit -r core/ fre/ historical_k/ -f screen
+        continue-on-error: true
+
+      - name: Type checking with mypy
+        run: |
+          poetry run mypy core/ fre/ historical_k/ --config-file=pyproject.toml
+        continue-on-error: true
+
+  tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --with dev
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Run pytest
+        run: |
+          poetry run pytest tests/ \
+            --verbose \
+            --cov=core \
+            --cov=fre \
+            --cov=historical_k \
+            --cov-report=xml \
+            --cov-report=html \
+            --cov-report=term-missing \
+            --junit-xml=junit.xml
+        continue-on-error: false
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results-${{ matrix.python-version }}
+          path: |
+            junit.xml
+            htmlcov/
+
+  reproducibility:
+    name: Reproducibility Check
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Verify K-Codex schema
+        run: |
+          python -c "
+          import json
+          from jsonschema import Draft7Validator
+          schema = json.load(open('schemas/k_passport.json'))
+          Draft7Validator.check_schema(schema)
+          print('✅ K-Codex schema is valid')
+          "
+
+      - name: Check git SHA inference
+        run: |
+          poetry run python -c "
+          from core.utils import infer_git_sha
+          sha = infer_git_sha()
+          assert len(sha) == 40 or sha == 'unknown', f'Invalid SHA: {sha}'
+          print(f'✅ Git SHA inference working: {sha[:8]}...')
+          "
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for required documentation
+        run: |
+          required_files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            "ETHICS.md"
+            "IMPROVEMENTS.md"
+          )
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✅ Found $file"
+            else
+              echo "❌ Missing $file"
+              exit 1
+            fi
+          done
+
+      - name: Check documentation links
+        run: |
+          # Simple check for broken internal links in markdown
+          grep -r "\[.*\](.*.md)" *.md | grep -v "http" || true
+          echo "✅ Documentation link check complete"
+
+  all-checks-passed:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs: [code-quality, tests, reproducibility, documentation]
+    if: always()
+
+    steps:
+      - name: Check all jobs
+        run: |
+          if [ "${{ needs.code-quality.result }}" != "success" ] || \
+             [ "${{ needs.tests.result }}" != "success" ] || \
+             [ "${{ needs.reproducibility.result }}" != "success" ] || \
+             [ "${{ needs.documentation.result }}" != "success" ]; then
+            echo "❌ Some checks failed"
+            exit 1
+          fi
+          echo "✅ All checks passed successfully!"

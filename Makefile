@@ -6,6 +6,7 @@ LOGDIR ?= logs/fre_phase1
 .PHONY: help init lint test fre-run historical-run docs
 .PHONY: dashboard notebook ai-suggest coverage demo clean
 .PHONY: holochain-publish holochain-query holochain-verify mycelix-demo
+.PHONY: format type-check security-check ci-local review-improvements
 
 help:  # Show all available targets
 	@echo "🌊 Kosmic Lab - Available Commands:"
@@ -85,6 +86,47 @@ validate:  # Run all checks (tests, lint, coverage)
 
 quick:  # Quick validation (tests only)
 	poetry run pytest -x --tb=short -q
+
+format:  # Auto-format code with black and isort
+	@echo "🎨 Formatting code..."
+	poetry run black core/ fre/ historical_k/ scripts/ tests/
+	poetry run isort core/ fre/ historical_k/ scripts/ tests/
+	@echo "✅ Code formatted!"
+
+type-check:  # Run mypy type checking
+	@echo "🔍 Running type checks..."
+	poetry run mypy core/ fre/ historical_k/ --config-file=pyproject.toml
+	@echo "✅ Type checks complete!"
+
+security-check:  # Run security scan with bandit
+	@echo "🔒 Running security scan..."
+	poetry run bandit -r core/ fre/ historical_k/ -f screen
+	@echo "✅ Security scan complete!"
+
+ci-local:  # Run full CI pipeline locally
+	@echo "🚀 Running CI pipeline locally..."
+	@echo ""
+	@echo "Step 1: Format check"
+	poetry run black --check core/ fre/ historical_k/ scripts/ tests/
+	@echo ""
+	@echo "Step 2: Import sorting check"
+	poetry run isort --check-only core/ fre/ historical_k/ scripts/ tests/
+	@echo ""
+	@echo "Step 3: Type checking"
+	make type-check
+	@echo ""
+	@echo "Step 4: Tests with coverage"
+	make coverage
+	@echo ""
+	@echo "✅ CI pipeline complete!"
+
+review-improvements:  # View code quality improvements
+	@echo "📊 Code Quality Improvements Summary"
+	@echo "===================================="
+	@cat IMPROVEMENTS.md | head -50
+	@echo ""
+	@echo "📖 Full report: IMPROVEMENTS.md"
+	@echo "🏗️  Architecture: ARCHITECTURE.md"
 
 # ========== Mycelix Integration ==========
 
