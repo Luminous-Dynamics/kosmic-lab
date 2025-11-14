@@ -13,6 +13,7 @@ from uuid import uuid4
 from jsonschema import Draft7Validator
 
 from core.config import ConfigBundle
+from core.utils import infer_git_sha
 
 
 class KPassportError(RuntimeError):
@@ -46,7 +47,7 @@ class KPassportWriter:
         """Construct a full passport record."""
         record: Dict[str, Any] = {
             "run_id": run_id or str(uuid4()),
-            "commit": self._infer_git_sha(),
+            "commit": infer_git_sha(),
             "config_hash": config.sha256 if config else "",
             "seed": seed if seed is not None else 0,
             "experiment": experiment,
@@ -78,19 +79,3 @@ class KPassportWriter:
         if errors:
             msg = "; ".join(err.message for err in errors)
             raise KPassportError(f"Passport validation failed: {msg}")
-
-    @staticmethod
-    def _infer_git_sha() -> str:
-        """Best-effort HEAD commit hash; returns 'UNKNOWN' if unavailable."""
-        head = Path(".git/HEAD")
-        if not head.exists():
-            return "UNKNOWN"
-
-        ref = head.read_text(encoding="utf-8").strip()
-        if ref.startswith("ref:"):
-            ref_path = Path(".git") / ref.split(" ", 1)[1]
-            if ref_path.exists():
-                return ref_path.read_text(encoding="utf-8").strip()
-        elif len(ref) == 40:
-            return ref
-        return "UNKNOWN"

@@ -28,6 +28,16 @@ if TYPE_CHECKING:
     from core.bioelectric import BioelectricGrid
 
 
+# Bioelectric rescue constants
+FEP_ERROR_THRESHOLD = 0.5  # Minimum prediction error to trigger rescue
+TARGET_RESTING_VOLTAGE = -70.0  # mV - healthy resting potential
+CORRECTION_FACTOR = 0.5  # Strength of voltage correction (v2: increased from 0.15)
+MOMENTUM_DECAY = 0.9  # Fraction of previous momentum to retain
+MOMENTUM_GAIN = 0.1  # Fraction of new correction to add
+VOLTAGE_CLAMP_MIN = -100.0  # mV - minimum allowed voltage (hyperpolarized)
+VOLTAGE_CLAMP_MAX = -10.0  # mV - maximum allowed voltage (depolarized)
+
+
 def fep_to_bioelectric(agent, timestep: int) -> None:
     """Trigger bioelectric response when sensory prediction error is high.
 
@@ -39,25 +49,24 @@ def fep_to_bioelectric(agent, timestep: int) -> None:
     This ensures rescue can overcome grid diffusion dynamics.
     """
     error = agent.prediction_errors.get("sensory", 0.0)
-    if error <= 0.5:
+    if error <= FEP_ERROR_THRESHOLD:
         return
 
     # Initialize momentum if first time
     if not hasattr(agent, "_voltage_momentum"):
         agent._voltage_momentum = 0.0
 
-    # Pull voltage toward resting potential (-70mV) with stronger correction
-    target_voltage = -70.0
-    # Increased from 0.15 to 0.5 for stronger effect
-    correction = (target_voltage - agent.voltage) * error * 0.5
+    # Pull voltage toward resting potential with stronger correction
+    correction = (TARGET_RESTING_VOLTAGE - agent.voltage) * error * CORRECTION_FACTOR
 
-    # Add momentum: 90% previous momentum + 10% new correction
-    # This accumulates corrections over time instead of single-step changes
-    agent._voltage_momentum = 0.9 * agent._voltage_momentum + 0.1 * correction
+    # Add momentum: accumulates corrections over time instead of single-step changes
+    agent._voltage_momentum = (
+        MOMENTUM_DECAY * agent._voltage_momentum + MOMENTUM_GAIN * correction
+    )
     agent.voltage += agent._voltage_momentum
 
     # Clamp to reasonable range (allow hyperpolarization)
-    agent.voltage = np.clip(agent.voltage, -100.0, -10.0)
+    agent.voltage = np.clip(agent.voltage, VOLTAGE_CLAMP_MIN, VOLTAGE_CLAMP_MAX)
 
     for neighbor_id in list(agent.gap_junctions.keys()):
         agent.gap_junctions[neighbor_id] *= 1.1

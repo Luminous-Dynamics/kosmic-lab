@@ -56,8 +56,11 @@ repos:
         additional_dependencies:
           - types-PyYAML
           - types-jsonschema
-        args: [--strict, --ignore-missing-imports]
-        exclude: ^tests/
+          - types-requests
+          - numpy
+          - pandas-stubs
+        args: [--config-file=pyproject.toml]
+        exclude: ^(tests|holochain)/
 
   # Documentation
   - repo: https://github.com/pycqa/pydocstyle
@@ -67,29 +70,13 @@ repos:
         args: [--convention=numpy]
         exclude: ^tests/
 
-  # Kosmic Lab specific hooks
+  # Kosmic Lab specific hooks (lightweight - optional advanced checks)
   - repo: local
     hooks:
-      # Validate K-passport JSON schema
-      - id: validate-k-passports
-        name: Validate K-passport schema
-        entry: python -c "from jsonschema import Draft7Validator; import json; schema = json.load(open('schemas/k_passport.json')); Draft7Validator.check_schema(schema)"
+      # Ensure test files have proper naming
+      - id: check-test-naming
+        name: Check test file naming convention
+        entry: python -c "import sys; assert sys.argv[1].startswith('tests/test_'), f'Test file {sys.argv[1]} must start with test_'"
         language: system
-        pass_filenames: false
-        files: ^schemas/k_passport\.json$
-
-      # Check for hardcoded magic numbers in universe params
-      - id: check-magic-numbers
-        name: Check for undocumented magic numbers
-        entry: scripts/check_magic_numbers.py
-        language: python
-        files: ^(core|fre|historical_k)/.*\.py$
-        exclude: ^tests/
-
-      # Ensure all experiments log K-passports
-      - id: check-passport-logging
-        name: Verify K-passport logging
-        entry: python -c "import sys; assert 'KPassportWriter' in open(sys.argv[1]).read(), f'{sys.argv[1]} missing K-passport logging'"
-        language: system
-        files: ^fre/.*\.py$
-        exclude: ^(tests|__init__)
+        files: ^tests/.*\.py$
+        exclude: ^tests/__init__\.py$

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 from pathlib import Path
 from typing import Dict, List
 
@@ -58,25 +59,59 @@ def load_passports(logdir: Path) -> pd.DataFrame:
     Raises:
         FileNotFoundError: If no JSON files are found in the directory
     """
+    logger = logging.getLogger(__name__)
     records: List[Dict] = []
+    errors = []
+
     for path in sorted(logdir.glob("*.json")):
-        with path.open("r", encoding="utf-8") as fh:
-            data = json.load(fh)
-        record = {
-            "run_id": data.get("run_id"),
-            "seed": data.get("seed"),
-            "K": data.get("metrics", {}).get("K"),
-            "TAT": data.get("metrics", {}).get("TAT"),
-            "Recovery": data.get("metrics", {}).get("Recovery"),
-            "in_corridor": data.get("metrics", {}).get("in_corridor", False),
-        }
-        params = data.get("params", {})
-        for key, value in params.items():
-            record[f"param_{key}"] = value
-        records.append(record)
+        try:
+            with path.open("r", encoding="utf-8") as fh:
+                data = json.load(fh)
+
+            # Validate required fields
+            if "metrics" not in data:
+                logger.warning(f"Skipping {path.name}: missing 'metrics' field")
+                errors.append((path.name, "missing 'metrics' field"))
+                continue
+
+            metrics = data["metrics"]
+            if "K" not in metrics:
+                logger.warning(f"Skipping {path.name}: missing 'K' metric")
+                errors.append((path.name, "missing 'K' metric"))
+                continue
+
+            record = {
+                "run_id": data.get("run_id", "unknown"),
+                "seed": data.get("seed", 0),
+                "K": metrics.get("K"),
+                "TAT": metrics.get("TAT", 0.0),
+                "Recovery": metrics.get("Recovery", 0.0),
+                "in_corridor": metrics.get("in_corridor", False),
+            }
+            params = data.get("params", {})
+            for key, value in params.items():
+                record[f"param_{key}"] = value
+            records.append(record)
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Skipping {path.name}: invalid JSON - {e}")
+            errors.append((path.name, f"invalid JSON: {e}"))
+        except Exception as e:
+            logger.error(f"Skipping {path.name}: unexpected error - {e}")
+            errors.append((path.name, f"unexpected error: {e}"))
 
     if not records:
+        if errors:
+            error_summary = "; ".join(f"{name}: {msg}" for name, msg in errors[:5])
+            raise ValueError(
+                f"No valid passport files found in {logdir}. "
+                f"Errors encountered: {error_summary}"
+            )
         raise FileNotFoundError(f"No passport JSON files found in {logdir}")
+
+    if errors:
+        logger.info(f"Loaded {len(records)} records, skipped {len(errors)} files with errors")
+
     return pd.DataFrame(records)
 
 
