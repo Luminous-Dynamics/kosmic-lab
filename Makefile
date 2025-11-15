@@ -7,6 +7,7 @@ LOGDIR ?= logs/fre_phase1
 .PHONY: dashboard notebook ai-suggest coverage demo clean benchmarks
 .PHONY: holochain-publish holochain-query holochain-verify mycelix-demo
 .PHONY: format type-check security-check ci-local review-improvements
+.PHONY: validate-install profile check-all migrate-v1.1 update-deps
 
 help:  # Show all available targets
 	@echo "🌊 Kosmic Lab - Available Commands:"
@@ -176,3 +177,114 @@ mycelix-demo:  # Complete Mycelix integration demo
 	make holochain-query
 	@echo ""
 	@echo "✅ Demo complete! K-passports are now on Mycelix DHT."
+
+# ========== Phase 10: Advanced Tooling ==========
+
+validate-install:  # Comprehensive installation validation
+	@echo "🔍 Validating Kosmic Lab installation..."
+	@./scripts/validate_installation.sh --verbose
+
+profile:  # Profile performance bottlenecks
+	@echo "⚡ Profiling performance..."
+	poetry run python scripts/profile_performance.py --format html
+	@echo "📊 Profile results: profiling/*.html"
+
+profile-all:  # Profile all functions with detailed output
+	@echo "⚡ Profiling all functions..."
+	poetry run python scripts/profile_performance.py --function all --samples 10000 --format html
+	@echo "📊 Detailed profile: profiling/*.html"
+
+check-all:  # Run ALL validation checks (installation, quality, tests)
+	@echo "🚀 Running comprehensive validation..."
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "1. Installation Validation"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@./scripts/validate_installation.sh
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "2. Code Quality Checks"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@./scripts/check_code_quality.sh
+	@echo ""
+	@echo "✅ All validation checks passed!"
+
+migrate-v1.1:  # Migrate from v1.0.0 to v1.1.0
+	@echo "🔄 Migrating to v1.1.0..."
+	@echo ""
+	@echo "Step 1: Update dependencies"
+	poetry install --sync
+	@echo ""
+	@echo "Step 2: Install pre-commit hooks"
+	poetry run pre-commit install
+	@echo ""
+	@echo "Step 3: Create .env from template"
+	@if [ ! -f .env ]; then \
+		cp .env.example .env; \
+		echo "✓ Created .env from .env.example"; \
+	else \
+		echo "⚠ .env already exists, skipping..."; \
+	fi
+	@echo ""
+	@echo "Step 4: Run tests"
+	make test
+	@echo ""
+	@echo "Step 5: Validate code quality"
+	./scripts/check_code_quality.sh
+	@echo ""
+	@echo "✅ Migration complete!"
+	@echo "📖 See CHANGELOG.md for full v1.1.0 details"
+
+update-deps:  # Update all dependencies
+	@echo "📦 Updating dependencies..."
+	poetry update
+	poetry lock
+	@echo "✅ Dependencies updated!"
+	@echo "⚠ Run 'make test' to verify compatibility"
+
+watch-tests:  # Watch for changes and auto-run tests
+	@echo "👀 Watching for changes..."
+	@echo "Press Ctrl+C to stop"
+	@poetry run pytest-watch tests/ --clear --nobeep
+
+install-dev:  # Install development tools
+	@echo "🛠️  Installing development tools..."
+	poetry install --with dev
+	poetry run pre-commit install
+	@echo "✅ Development tools installed!"
+
+docker-build:  # Build Docker image
+	@echo "🐳 Building Docker image..."
+	docker build -t kosmic-lab:latest .
+	@echo "✅ Docker image built: kosmic-lab:latest"
+
+docker-run:  # Run Kosmic Lab in Docker
+	@echo "🐳 Running Kosmic Lab in Docker..."
+	docker run -it --rm -v $(PWD)/data:/app/data -v $(PWD)/logs:/app/logs kosmic-lab:latest
+
+docker-shell:  # Open shell in Docker container
+	@echo "🐳 Opening shell in Docker..."
+	docker run -it --rm -v $(PWD):/app kosmic-lab:latest /bin/bash
+
+release-check:  # Pre-release validation checklist
+	@echo "🚀 Release Validation Checklist"
+	@echo "================================"
+	@echo ""
+	@echo "Running comprehensive checks..."
+	@echo ""
+	make check-all
+	@echo ""
+	@echo "Running benchmarks..."
+	make benchmarks
+	@echo ""
+	@echo "Building documentation..."
+	make docs
+	@echo ""
+	@echo "✅ Release validation complete!"
+	@echo ""
+	@echo "📋 Next steps:"
+	@echo "  1. Update version in pyproject.toml"
+	@echo "  2. Update CHANGELOG.md"
+	@echo "  3. Review RELEASE_CHECKLIST.md"
+	@echo "  4. Create git tag: git tag -a vX.Y.Z -m 'Release X.Y.Z'"
+	@echo "  5. Push: git push && git push --tags"
