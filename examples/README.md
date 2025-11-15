@@ -11,6 +11,8 @@ poetry run python examples/01_hello_kosmic.py
 poetry run python examples/02_advanced_k_index.py
 poetry run python examples/03_multi_universe.py
 poetry run python examples/04_bioelectric_rescue.py
+poetry run python examples/05_neuroscience_eeg_analysis.py
+poetry run python examples/06_ai_model_coherence.py
 ```
 
 ## Examples Overview
@@ -136,21 +138,122 @@ This example is inspired by:
 
 ---
 
+### 05_neuroscience_eeg_analysis.py - Neuroscience Application
+
+**Difficulty**: Intermediate
+**Runtime**: ~15 seconds
+**Topics**: EEG analysis, consciousness monitoring, clinical applications, K-Lag
+
+Real-world neuroscience application demonstrating:
+- EEG signal processing and feature extraction
+- Consciousness level prediction from EEG data
+- K-Index for validating prediction coherence
+- Temporal dynamics analysis with K-Lag
+- Clinical interpretation and decision-making
+
+**Key Learning**:
+- Applying K-Index to real-world neuroscience
+- EEG-based consciousness assessment
+- Temporal delay detection (prediction lag)
+- Clinical threshold determination
+- Multi-level consciousness analysis
+
+**Output**:
+- `outputs/example_05_eeg_analysis.png` - Comprehensive visualization
+- `logs/example_05_eeg_kcodex.json` - K-Codex records for 4 consciousness levels
+
+**Use Cases**:
+- Anesthesia depth monitoring
+- ICU sedation assessment
+- Sleep stage classification
+- Disorders of consciousness diagnosis
+
+---
+
+### 06_ai_model_coherence.py - AI Interpretability
+
+**Difficulty**: Intermediate
+**Runtime**: ~20 seconds
+**Topics**: AI alignment, interpretability, internal coherence, overconfidence detection
+
+Analyze internal coherence in neural networks:
+- Train a simple MLP classifier
+- Extract hidden layer representations
+- Measure coherence between internals and predictions
+- Detect model overconfidence
+- Validate alignment between "understanding" and output
+
+**Key Learning**:
+- Applying K-Index to AI interpretability
+- Analyzing model internal representations
+- Detecting misalignment between internals and predictions
+- Calibration analysis
+- Multi-level coherence (representation → prediction → truth)
+
+**Output**:
+- `outputs/example_06_ai_coherence.png` - Model analysis visualization
+- `logs/example_06_ai_coherence_kcodex.json` - K-Codex record
+
+**Use Cases**:
+- Model debugging and validation
+- Alignment research (AI safety)
+- Detecting when models are uncertain but confident
+- Understanding representation quality
+- Trustworthy AI development
+
+---
+
+### interactive_tutorial.ipynb - Complete Interactive Tutorial
+
+**Difficulty**: Beginner to Advanced
+**Runtime**: Self-paced (~1 hour)
+**Topics**: All major features with executable code
+
+Complete hands-on Jupyter notebook covering:
+- All core utilities and metrics
+- K-Index, K-Lag, K-Codex workflows
+- Bioelectric and FRE simulations
+- Visualization and analysis
+- Interactive exercises and challenges
+
+**Key Learning**:
+- End-to-end workflows
+- Best practices
+- Common patterns
+- Troubleshooting
+
+**Usage**:
+```bash
+jupyter notebook examples/interactive_tutorial.ipynb
+# or
+jupyter lab examples/interactive_tutorial.ipynb
+```
+
+---
+
 ## Example Progression Path
 
 We recommend following this learning path:
 
 ```
-01_hello_kosmic.py          (Start here - 5 min)
+01_hello_kosmic.py              (Start here - 5 min)
     ↓
-02_advanced_k_index.py      (Statistical depth - 15 min)
+02_advanced_k_index.py          (Statistical depth - 15 min)
     ↓
-03_multi_universe.py        (Scaling up - 20 min)
+interactive_tutorial.ipynb      (Interactive learning - 60 min) [OPTIONAL]
     ↓
-04_bioelectric_rescue.py    (Advanced concepts - 20 min)
+03_multi_universe.py            (Scaling up - 20 min)
+    ↓
+04_bioelectric_rescue.py        (Advanced concepts - 20 min)
+    ↓
+05_neuroscience_eeg_analysis.py (Real-world neuroscience - 15 min)
+    ↓
+06_ai_model_coherence.py        (AI interpretability - 20 min)
 ```
 
-Total time to complete all examples: ~1 hour
+**Total time**: ~2 hours (or ~3 hours with interactive tutorial)
+
+**Quick Path** (essentials only): 01 → 02 → 05 or 06 (~35 min)
 
 ## Common Patterns
 

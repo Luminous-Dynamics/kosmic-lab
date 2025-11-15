@@ -1,0 +1,38 @@
+{
+    "recommendations": [
+        // Python Development
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+
+        // Code Quality
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.mypy-type-checker",
+
+        // Testing
+        "littlefoxteam.vscode-python-test-adapter",
+        "hbenl.vscode-test-explorer",
+
+        // Git
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+
+        // Markdown
+        "yzhang.markdown-all-in-one",
+        "davidanson.vscode-markdownlint",
+
+        // Utilities
+        "visualstudioexptteam.vscodeintellicode",
+        "christian-kohler.path-intellisense",
+        "streetsidesoftware.code-spell-checker",
+
+        // Data Science
+        "ms-toolsai.datawrangler",
+        "ms-toolsai.jupyter-renderers",
+
+        // Productivity
+        "alefragnani.bookmarks",
+        "gruntfuggly.todo-tree"
+    ]
+}
