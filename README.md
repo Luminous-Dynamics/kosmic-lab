@@ -2,15 +2,30 @@
 
 **Revolutionary AI-Accelerated Platform for Consciousness Research**
 
+<div align="center">
+
 [![CI/CD](https://github.com/Luminous-Dynamics/kosmic-lab/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/Luminous-Dynamics/kosmic-lab/actions)
 [![Code Quality](https://img.shields.io/badge/code%20quality-A+-brightgreen.svg)](IMPROVEMENTS.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Type checked: mypy](https://img.shields.io/badge/type%20checked-mypy-blue.svg)](http://mypy-lang.org/)
-[![Tests](https://img.shields.io/badge/coverage-90%25%2B-brightgreen)](https://codecov.io/gh/kosmic-lab)
+[![Tests](https://img.shields.io/badge/coverage-90%25%2B-brightgreen)](tests/)
+[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+
 [![Reproducibility](https://img.shields.io/badge/reproducibility-99.9%25-blue)](FEATURES.md#k-passport-system)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-comprehensive-blue.svg)](docs/)
+[![Examples](https://img.shields.io/badge/examples-4-blue.svg)](examples/)
+[![Contributing](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+[Quick Start](#-quick-start-5-minutes) •
+[Features](#-what-makes-this-revolutionary) •
+[Documentation](#-documentation) •
+[Examples](examples/) •
+[Contributing](CONTRIBUTING.md)
+
+</div>
 
 > *"Coherence is love made computational."*
 
@@ -65,15 +80,18 @@ Unified research workspace for the **Kosmic Simulation & Coherence Framework**. 
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/kosmic-lab.git
+git clone https://github.com/Luminous-Dynamics/kosmic-lab.git
 cd kosmic-lab
 
-# Option 1: NixOS (recommended - 100% reproducible)
-nix develop
-poetry install --sync
+# Automated setup (recommended - 2 minutes)
+./scripts/setup_dev_env.sh
 
-# Option 2: Standard Python
-poetry install --sync
+# Or manual setup
+poetry install
+poetry run pre-commit install
+
+# Verify installation
+make test
 ```
 
 ### Your First Experiment
