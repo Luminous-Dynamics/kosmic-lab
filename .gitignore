@@ -29,6 +29,8 @@ logs/
 # Jupyter & analysis artefacts
 .ipynb_checkpoints/
 *.ipynb
+# Exception: Include tutorial notebooks
+!examples/interactive_tutorial.ipynb
 
 # Build artifacts
 target/

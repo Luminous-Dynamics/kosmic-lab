@@ -1,0 +1,126 @@
+# Stale Issue and PR Management
+# Automatically marks and closes inactive issues and pull requests
+#
+# This workflow helps maintain repository health by:
+# - Marking issues/PRs as stale after 60 days of inactivity
+# - Closing stale items after 7 additional days
+# - Exempting certain labels from going stale
+#
+# Configuration can be adjusted based on project needs
+
+name: Stale Issue Management
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Mark and Close Stale Items
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mark stale issues and PRs
+        uses: actions/stale@v9
+        with:
+          # Repository configuration
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Stale issue configuration
+          stale-issue-message: |
+            👋 This issue has been automatically marked as stale because it has not had
+            recent activity for 60 days. It will be closed in 7 days if no further activity
+            occurs.
+
+            If this issue is still relevant, please:
+            - Add a comment describing the current status
+            - Update the issue with any new information
+            - Remove the `stale` label
+
+            Thank you for your contributions to Kosmic Lab! 🙏
+
+          close-issue-message: |
+            🔒 This issue has been automatically closed due to inactivity.
+
+            If you believe this issue should remain open:
+            - Please reopen it and provide an update
+            - Reference this issue in a new issue if the problem persists
+
+            Thank you for your understanding! 🙏
+
+          stale-issue-label: 'stale'
+          days-before-issue-stale: 60
+          days-before-issue-close: 7
+
+          # Stale PR configuration
+          stale-pr-message: |
+            👋 This pull request has been automatically marked as stale because it has not
+            had recent activity for 45 days. It will be closed in 7 days if no further
+            activity occurs.
+
+            If this PR is still being worked on, please:
+            - Add a comment with a status update
+            - Push new commits if changes are needed
+            - Remove the `stale` label
+            - Request a review if ready
+
+            Thank you for your contributions to Kosmic Lab! 🙏
+
+          close-pr-message: |
+            🔒 This pull request has been automatically closed due to inactivity.
+
+            If you'd like to continue this work:
+            - Please reopen the PR and provide an update
+            - Rebase on the latest main branch if needed
+            - Request a review when ready
+
+            Thank you for your understanding! 🙏
+
+          stale-pr-label: 'stale'
+          days-before-pr-stale: 45  # PRs go stale faster than issues
+          days-before-pr-close: 7
+
+          # Exempt labels (issues/PRs with these labels never go stale)
+          exempt-issue-labels: |
+            pinned
+            security
+            roadmap
+            help wanted
+            good first issue
+            epic
+            rfc
+            governance
+
+          exempt-pr-labels: |
+            pinned
+            security
+            work-in-progress
+            blocked
+
+          # Exempt milestones
+          exempt-milestones: true
+          exempt-all-milestones: false
+
+          # Exempt assignees
+          exempt-assignees: false
+          exempt-all-assignees: false
+
+          # Label priority
+          # Higher priority labels are checked first
+          ascending: false
+
+          # Operations per run (to avoid rate limiting)
+          operations-per-run: 100
+
+          # Remove stale label when issues/PRs are updated
+          remove-stale-when-updated: true
+
+          # Additional options
+          delete-branch: false  # Don't auto-delete PR branches
+          enable-statistics: true  # Show statistics in logs

@@ -9,10 +9,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
+### Added (Phases 10-11)
+
+#### Phase 11: CI/CD Excellence & Community Foundation
+
+**CI/CD Enhancements**:
+- **.github/workflows/performance.yml** (230+ lines) - Performance regression testing
+  - 3 automated jobs: benchmark, profile, memory-usage
+  - Performance targets validation (N=100: <10ms, N=1k: <100ms, N=10k: <1s)
+  - PR comparison with baseline (shows % performance change)
+  - Weekly schedule (Monday 9 AM UTC)
+  - Memory limit validation (<100MB for N=10k)
+
+**GitHub Issue Templates**:
+- **Bug Report** (.github/ISSUE_TEMPLATE/bug_report.yml) - 13 fields with K-Codex support
+- **Feature Request** (feature_request.yml) - 11 fields with priority tracking
+- **Question** (question.yml) - 8 fields with documentation guidance
+- **Config** (config.yml) - Disables blank issues, links to resources
+
+**Community Infrastructure**:
+- **CONTRIBUTORS.md** (250+ lines) - Complete contributor recognition system
+  - 13 contribution categories (code, docs, examples, testing, bugs, ideas, research, etc.)
+  - 5 contribution paths with quick starts
+  - All-contributors bot integration (future)
+  - Technology acknowledgments
+
+- **GOVERNANCE.md** (450+ lines) - Project governance document
+  - 3 decision levels (Routine, Significant, Major)
+  - RFC process (4 steps)
+  - 5 roles (Users, Contributors, Reviewers, Core Team, Project Lead)
+  - Code review process for different PR sizes
+  - Conflict resolution procedures
+  - Community health metrics (<48h issue response, <7d PR review)
+
+**Developer Tools**:
+- **scripts/bash_completion.sh** (50+ lines) - Bash tab completion for Makefile
+- **scripts/zsh_completion.zsh** (80+ lines) - Zsh tab completion with descriptions
+
+#### Phase 10: Advanced Tooling & Vision
+
+**Validation & Profiling**:
+- **scripts/validate_installation.sh** (450+ lines) - Comprehensive installation validator
+  - 12 validation sections (system, structure, environment, modules, tests, etc.)
+  - Color-coded output with pass/fail/warning counters
+  - Options: --verbose, --strict (for CI)
+
+- **scripts/profile_performance.py** (450+ lines) - Performance profiling utility
+  - Profiles K-Index, Bootstrap CI, K-Lag, Git SHA inference
+  - Output formats: text, JSON, HTML (visual reports)
+  - Statistics: mean, std, min, max, median, P95, P99
+  - Detailed cProfile integration
+
+**Git Configuration**:
+- **.gitattributes** (150+ lines) - Git behavior standardization
+  - Line ending normalization (LF/CRLF handling)
+  - Binary file handling (images, data, archives)
+  - Diff drivers (Python, JSON, YAML, Markdown)
+  - Merge strategies (union for notebooks, manual for configs)
+  - GitHub Linguist overrides for accurate language stats
+
+**Project Vision**:
+- **VISION.md** (550+ lines) - Project vision and roadmap
+  - Vision: Accelerate consciousness research by 5-10 years
+  - Core values: Reproducibility, rigor, collaboration, developer joy, performance
+  - Roadmap: v1.2 (performance), v1.3 (analytics), v2.0 (Mycelix), v2.1 (AI)
+  - Long-term goals: 10,000+ users, 1,000+ contributors, Nobel Prize research
+  - Success metrics for 1, 3, and 10 years
+
+**Makefile Enhancements**:
+- Added 14 new targets (54 total, was 40)
+  - Validation: validate-install, check-all, profile, release-check
+  - Migration: migrate-v1.1 (one-command v1.0.0 → v1.1.0)
+  - Development: watch-tests, install-dev, update-deps
+  - Docker: docker-build, docker-run, docker-shell
+
+### Planned (v1.2.0 and beyond)
+- Distributed computing (Dask/Ray integration)
+- GPU acceleration for large simulations
 - Kubernetes manifests for cluster deployment
 - Advanced monitoring with Prometheus/Grafana
-- v2.0.0 release preparation
+- Interactive Jupyter tutorials
+- API reference documentation
 
 ---
 
