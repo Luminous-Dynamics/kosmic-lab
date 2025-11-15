@@ -1,0 +1,98 @@
+name: ❓ Question
+description: Ask a question about Kosmic Lab
+title: "[Question]: "
+labels: ["question"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your question! Please check the FAQ.md first - your question might already be answered!
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: How do I...?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What is your question about?
+      options:
+        - Installation & Setup
+        - Usage & Features
+        - K-Index & Metrics
+        - K-Codex & Reproducibility
+        - Performance & Optimization
+        - Examples & Tutorials
+        - Deployment & Production
+        - Contributing & Development
+        - Research & Scientific Methods
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide context for your question
+      placeholder: |
+        I am trying to...
+        I have read...
+        I am confused about...
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What Have You Tried?
+      description: What have you already attempted?
+      placeholder: |
+        - Checked FAQ.md
+        - Read documentation
+        - Tried examples
+
+  - type: input
+    id: version
+    attributes:
+      label: Kosmic Lab Version
+      description: What version are you using?
+      placeholder: "1.1.0"
+
+  - type: checkboxes
+    id: documentation-check
+    attributes:
+      label: Documentation Checked
+      description: Have you checked these resources?
+      options:
+        - label: FAQ.md
+        - label: QUICKSTART.md
+        - label: README.md
+        - label: examples/
+        - label: TROUBLESHOOTING.md
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any additional information that might help answer your question
+      placeholder: Additional context...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please verify before submitting
+      options:
+        - label: I have checked FAQ.md and documentation
+          required: true
+        - label: I have searched existing issues/discussions
+          required: true
+        - label: This is a genuine question, not a bug report or feature request
+          required: true

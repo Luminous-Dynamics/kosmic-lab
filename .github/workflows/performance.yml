@@ -1,0 +1,208 @@
+name: Performance Regression Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run weekly on Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+
+jobs:
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for comparison
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-3.11-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --with dev
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Run benchmarks
+        run: |
+          echo "Running performance benchmarks..."
+          poetry run python benchmarks/run_benchmarks.py --save benchmarks/results/ci_benchmark.json
+
+      - name: Display benchmark results
+        run: |
+          echo "=== Benchmark Results ==="
+          cat benchmarks/results/ci_benchmark.json | python -m json.tool
+
+      - name: Performance validation
+        run: |
+          echo "Validating performance targets..."
+          poetry run python -c "
+          import json
+
+          with open('benchmarks/results/ci_benchmark.json') as f:
+              results = json.load(f)
+
+          # Define performance targets (in seconds)
+          targets = {
+              'k_index_100': 0.01,     # 10ms for N=100
+              'k_index_1000': 0.1,     # 100ms for N=1000
+              'k_index_10000': 1.0,    # 1s for N=10000
+          }
+
+          failed = []
+          for key, target in targets.items():
+              if key in results:
+                  actual = results[key]['mean']
+                  if actual > target:
+                      failed.append(f'{key}: {actual:.3f}s > {target:.3f}s')
+                      print(f'❌ {key}: {actual:.3f}s (target: {target:.3f}s)')
+                  else:
+                      print(f'✅ {key}: {actual:.3f}s (target: {target:.3f}s)')
+
+          if failed:
+              print(f'\n❌ Performance regression detected:')
+              for f in failed:
+                  print(f'  - {f}')
+              exit(1)
+          else:
+              print('\n✅ All performance targets met!')
+          "
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: benchmarks/results/ci_benchmark.json
+
+      - name: Compare with baseline (main branch)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Comparing performance with main branch..."
+          git checkout main
+          poetry run python benchmarks/run_benchmarks.py --save benchmarks/results/baseline.json
+          git checkout -
+
+          poetry run python -c "
+          import json
+
+          with open('benchmarks/results/ci_benchmark.json') as f:
+              current = json.load(f)
+          with open('benchmarks/results/baseline.json') as f:
+              baseline = json.load(f)
+
+          print('\n=== Performance Comparison ===')
+          print(f'{'Benchmark':<20} {'Current':<15} {'Baseline':<15} {'Change':<10}')
+          print('-' * 65)
+
+          for key in current.keys():
+              if key in baseline:
+                  curr_time = current[key]['mean']
+                  base_time = baseline[key]['mean']
+                  change = ((curr_time - base_time) / base_time) * 100
+                  symbol = '📈' if change > 0 else '📉'
+                  print(f'{key:<20} {curr_time:<15.6f} {base_time:<15.6f} {symbol} {change:>+6.1f}%')
+          "
+
+  profile:
+    name: Profiling Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run profiler
+        run: |
+          echo "Running performance profiler..."
+          poetry run python scripts/profile_performance.py --format json --output profiling/
+
+      - name: Upload profile results
+        uses: actions/upload-artifact@v3
+        with:
+          name: profile-results
+          path: profiling/
+
+  memory-usage:
+    name: Memory Usage Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Check memory usage
+        run: |
+          echo "Checking memory usage..."
+          poetry run python -c "
+          import numpy as np
+          import tracemalloc
+          from fre.metrics.k_index import k_index
+
+          # Start memory tracking
+          tracemalloc.start()
+
+          # Run K-Index computation
+          rng = np.random.default_rng(42)
+          observed = rng.random(10000)
+          actual = rng.random(10000)
+          k = k_index(observed, actual)
+
+          # Get memory usage
+          current, peak = tracemalloc.get_traced_memory()
+          tracemalloc.stop()
+
+          print(f'Current memory usage: {current / 1024 / 1024:.2f} MB')
+          print(f'Peak memory usage: {peak / 1024 / 1024:.2f} MB')
+
+          # Validate memory usage is reasonable (<100MB)
+          if peak > 100 * 1024 * 1024:
+              print(f'❌ Memory usage too high: {peak / 1024 / 1024:.2f} MB')
+              exit(1)
+          else:
+              print('✅ Memory usage within limits')
+          "

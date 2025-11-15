@@ -1,0 +1,151 @@
+name: 🐛 Bug Report
+description: File a bug report to help us improve
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Run command '...'
+        2. See error
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear description of what you expected to happen
+      placeholder: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: What went wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: Please copy and paste any relevant log output
+      placeholder: Paste error messages here
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Kosmic Lab Version
+      description: What version of Kosmic Lab are you running?
+      placeholder: "1.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      description: What version of Python are you using?
+      placeholder: "3.11.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What OS are you using?
+      placeholder: "Ubuntu 22.04"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation Method
+      description: How did you install Kosmic Lab?
+      options:
+        - Git clone + Poetry
+        - Docker
+        - PyPI (pip)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Any additional environment details (virtual environment, dependencies, etc.)
+      placeholder: |
+        - Virtual environment: Poetry venv
+        - Key dependencies: numpy 1.26.4, scipy 1.11.4
+        - GPU: None
+      render: markdown
+
+  - type: textarea
+    id: kcodex
+    attributes:
+      label: K-Codex Information
+      description: If applicable, provide K-Codex details for reproducibility
+      placeholder: |
+        ```json
+        {
+          "git_sha": "abc123...",
+          "config_hash": "def456...",
+          "seed": 42
+        }
+        ```
+      render: json
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: Any additional information that might help
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please verify the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have provided steps to reproduce the issue
+          required: true
+        - label: I have included error logs/messages
+          required: false
+        - label: I have provided version and environment information
+          required: true
+        - label: I have checked the FAQ.md and TROUBLESHOOTING.md
+          required: false
