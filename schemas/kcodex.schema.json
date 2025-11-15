@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kosmic-lab.org/schemas/kcodex.schema.json",
+  "title": "K-Codex Record",
+  "description": "Schema for K-Codex reproducibility records",
+  "type": "object",
+  "required": ["experiment_name", "timestamp", "git_sha", "params", "metrics"],
+  "properties": {
+    "experiment_name": {
+      "type": "string",
+      "description": "Unique experiment identifier",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp",
+      "format": "date-time"
+    },
+    "git_sha": {
+      "type": "string",
+      "description": "Git commit SHA",
+      "pattern": "^[0-9a-f]{7,40}$|^unknown$"
+    },
+    "config_hash": {
+      "type": "string",
+      "description": "Hash of configuration parameters",
+      "pattern": "^[0-9a-f]+$"
+    },
+    "params": {
+      "type": "object",
+      "description": "Experiment parameters",
+      "additionalProperties": true
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Experiment metrics and results",
+      "properties": {
+        "k_index": {
+          "type": "number",
+          "description": "K-Index value"
+        },
+        "harmony": {
+          "type": "number",
+          "description": "Harmony metric"
+        },
+        "coherence": {
+          "type": "number",
+          "description": "Coherence score"
+        }
+      },
+      "additionalProperties": true
+    },
+    "seed": {
+      "type": "integer",
+      "description": "Random seed used",
+      "minimum": 0
+    },
+    "environment": {
+      "type": "object",
+      "description": "Execution environment details",
+      "properties": {
+        "python_version": {
+          "type": "string",
+          "description": "Python version",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "platform": {
+          "type": "string",
+          "description": "Operating system platform"
+        },
+        "hostname": {
+          "type": "string",
+          "description": "Hostname where experiment ran"
+        },
+        "cpu_count": {
+          "type": "integer",
+          "description": "Number of CPU cores",
+          "minimum": 1
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "description": "Package versions",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "additionalProperties": true
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional notes about the experiment"
+    }
+  },
+  "additionalProperties": false
+}

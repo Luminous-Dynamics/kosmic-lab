@@ -18,18 +18,18 @@ repos:
 
   # Python code formatting
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 24.1.1
     hooks:
       - id: black
-        language_version: python3.11
-        args: [--line-length=100]
+        language_version: python3.10
+        args: [--line-length=88]
 
   # Import sorting
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
-        args: [--profile=black, --line-length=100]
+        args: [--profile=black, --line-length=88]
 
   # Linting
   - repo: https://github.com/pycqa/flake8
@@ -37,20 +37,24 @@ repos:
     hooks:
       - id: flake8
         args:
-          - --max-line-length=100
-          - --extend-ignore=E203,W503  # Black compatibility
-          - --max-complexity=10
+          - --max-line-length=88
+          - --extend-ignore=E203,W503,E501  # Black compatibility
+          - --max-complexity=15
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-bugbear
 
   # Security checks
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
+    rev: 1.7.6
     hooks:
       - id: bandit
-        args: [--skip=B101]  # Allow assert in tests
+        args: [-r, core/, fre/, historical_k/, -f, screen, --skip, B101]
+        exclude: ^tests/
 
   # Type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
       - id: mypy
         additional_dependencies:
@@ -59,24 +63,46 @@ repos:
           - types-requests
           - numpy
           - pandas-stubs
-        args: [--config-file=pyproject.toml]
-        exclude: ^(tests|holochain)/
+        args: [--config-file=pyproject.toml, --ignore-missing-imports]
+        exclude: ^(tests|holochain|scripts|benchmarks)/
 
   # Documentation
   - repo: https://github.com/pycqa/pydocstyle
     rev: 6.3.0
     hooks:
       - id: pydocstyle
-        args: [--convention=numpy]
-        exclude: ^tests/
+        args: [--convention=google]
+        exclude: ^(tests|scripts|benchmarks)/
 
-  # Kosmic Lab specific hooks (lightweight - optional advanced checks)
-  - repo: local
+  # Additional file checks
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
     hooks:
-      # Ensure test files have proper naming
-      - id: check-test-naming
-        name: Check test file naming convention
-        entry: python -c "import sys; assert sys.argv[1].startswith('tests/test_'), f'Test file {sys.argv[1]} must start with test_'"
-        language: system
-        files: ^tests/.*\.py$
-        exclude: ^tests/__init__\.py$
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: python-no-eval
+      - id: python-use-type-annotations
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
+
+# Configuration
+default_language_version:
+  python: python3.10
+
+exclude: |
+  (?x)^(
+      \.git/|
+      \.venv/|
+      __pycache__/|
+      \.pytest_cache/|
+      \.mypy_cache/|
+      logs/|
+      data/|
+      htmlcov/|
+      docs/_build/|
+      \.ipynb_checkpoints/
+  )
+
+fail_fast: false
+minimum_pre_commit_version: '2.20.0'

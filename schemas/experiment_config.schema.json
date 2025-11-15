@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kosmic-lab.org/schemas/experiment_config.schema.json",
+  "title": "Experiment Configuration",
+  "description": "Schema for Kosmic Lab experiment configuration",
+  "type": "object",
+  "required": ["experiment_name", "params"],
+  "properties": {
+    "experiment_name": {
+      "type": "string",
+      "description": "Unique name for this experiment",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description of the experiment",
+      "maxLength": 500
+    },
+    "params": {
+      "type": "object",
+      "description": "Experiment parameters",
+      "properties": {
+        "consciousness": {
+          "type": "number",
+          "description": "Consciousness parameter (0-1)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "coherence": {
+          "type": "number",
+          "description": "Coherence parameter (0-1)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "fep": {
+          "type": "number",
+          "description": "Free Energy Principle parameter (0-1)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "n_samples": {
+          "type": "integer",
+          "description": "Number of samples to generate",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "n_seeds": {
+          "type": "integer",
+          "description": "Number of random seeds to use",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 3
+        },
+        "timesteps": {
+          "type": "integer",
+          "description": "Number of simulation timesteps",
+          "minimum": 1,
+          "maximum": 100000,
+          "default": 100
+        },
+        "threshold": {
+          "type": "number",
+          "description": "Threshold value",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5
+        }
+      },
+      "additionalProperties": true
+    },
+    "seed": {
+      "type": "integer",
+      "description": "Random seed for reproducibility",
+      "minimum": 0,
+      "default": 42
+    },
+    "output_dir": {
+      "type": "string",
+      "description": "Output directory for results",
+      "default": "logs"
+    },
+    "log_level": {
+      "type": "string",
+      "description": "Logging level",
+      "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+      "default": "INFO"
+    },
+    "parallel": {
+      "type": "boolean",
+      "description": "Enable parallel execution",
+      "default": false
+    },
+    "n_cores": {
+      "type": "integer",
+      "description": "Number of CPU cores to use (0 = auto)",
+      "minimum": 0,
+      "default": 0
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags for organizing experiments",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$"
+      },
+      "uniqueItems": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "experiment_name": "baseline_experiment",
+      "description": "Baseline experiment for consciousness modeling",
+      "params": {
+        "consciousness": 0.7,
+        "coherence": 0.8,
+        "fep": 0.5,
+        "n_samples": 100,
+        "timesteps": 100
+      },
+      "seed": 42,
+      "output_dir": "logs/baseline",
+      "log_level": "INFO",
+      "parallel": false,
+      "tags": ["baseline", "consciousness"],
+      "metadata": {
+        "researcher": "John Doe",
+        "date": "2025-11-15"
+      }
+    }
+  ]
+}

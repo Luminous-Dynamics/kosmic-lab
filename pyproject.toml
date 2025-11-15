@@ -6,7 +6,7 @@ authors = [{name = "Kosmic Lab Team", email = "kosmic-lab@example.org"}]
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-keywords = ["coherence", "consciousness", "simulation", "reciprocity", "k-index"]
+keywords = ["coherence", "consciousness", "simulation", "reciprocity", "k-index", "bioelectric", "fep"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
@@ -15,7 +15,16 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Typing :: Typed",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Luminous-Dynamics/kosmic-lab"
+Documentation = "https://kosmic-lab.readthedocs.io"
+Repository = "https://github.com/Luminous-Dynamics/kosmic-lab"
+Issues = "https://github.com/Luminous-Dynamics/kosmic-lab/issues"
+Changelog = "https://github.com/Luminous-Dynamics/kosmic-lab/blob/main/CHANGELOG.md"
 
 [tool.poetry]
 name = "kosmic-lab"
@@ -62,7 +71,7 @@ jupyter = "^1.0"
 nbconvert = "^7.14"
 
 [tool.black]
-line-length = 100
+line-length = 88
 target-version = ['py310', 'py311', 'py312']
 include = '\.pyi?$'
 extend-exclude = '''
@@ -77,19 +86,21 @@ extend-exclude = '''
   | build
   | dist
   | holochain
+  | docs/_build
 )/
 '''
 
 [tool.isort]
 profile = "black"
-line_length = 100
+line_length = 88
 multi_line_output = 3
 include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 skip_gitignore = true
-skip = [".venv", "venv", "holochain"]
+skip = [".venv", "venv", "holochain", "docs/_build"]
+src_paths = ["core", "fre", "historical_k", "scripts", "tests", "benchmarks", "examples"]
 
 [tool.mypy]
 python_version = "3.10"
@@ -130,7 +141,49 @@ addopts = [
     "--cov=historical_k",
     "--cov-report=term-missing",
     "--cov-report=html",
+    "--strict-markers",
+    "--tb=short",
 ]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "requires_gpu: marks tests that require GPU",
+    "network: marks tests that require network access",
+]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["core", "fre", "historical_k"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/holochain/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "venv"]
+tests = ["B201", "B301"]
+skips = ["B101", "B601"]
 
 [build-system]
 requires = ["poetry-core>=1.8.0"]
