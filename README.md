@@ -132,11 +132,29 @@ make help
 
 ## 📚 Documentation
 
-### Essential Reading
+### Getting Started (Start Here!)
 - **[QUICKSTART.md](QUICKSTART.md)** - Get running in 5 minutes
-- **[GLOSSARY.md](GLOSSARY.md)** - 40+ key concepts explained
-- **[FEATURES.md](FEATURES.md)** - Complete revolutionary features catalog
+- **[FAQ.md](FAQ.md)** - 50+ Q&A covering all topics (NEW!)
+- **[examples/](examples/)** - 4 progressive tutorials (beginner → advanced)
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Fast reference cheatsheet
+
+### Core Concepts & Features
+- **[GLOSSARY.md](docs/GLOSSARY.md)** - 40+ key concepts explained
+- **[FEATURES.md](docs/FEATURES.md)** - Complete revolutionary features catalog
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and design patterns
 - **[TRANSFORMATION_SUMMARY.md](TRANSFORMATION_SUMMARY.md)** - Our journey to 10/10
+
+### Development & Contributing
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Comprehensive development guide (650+ lines)
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community standards
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+
+### Deployment & Operations
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide (NEW!)
+- **[DOCKER.md](DOCKER.md)** - Docker containerization guide
+- **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability reporting
+- **[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)** - Release process for maintainers (NEW!)
 
 ### Publication Standards
 - **[PUBLICATION_STANDARDS.md](PUBLICATION_STANDARDS.md)** - 📄 **LaTeX workflow for all papers** (mandatory)
@@ -144,11 +162,16 @@ make help
   - BibTeX for references, 300+ DPI figures
   - See also: [paper2_analyses/LATEX_WORKFLOW.md](paper2_analyses/LATEX_WORKFLOW.md)
 
-### Integration & Advanced
+### Integration & Advanced Topics
 - **[MYCELIX_INTEGRATION_ARCHITECTURE.md](docs/MYCELIX_INTEGRATION_ARCHITECTURE.md)** - Decentralized science architecture
+- **[K_CODEX_EXPLAINED.md](docs/K_CODEX_EXPLAINED.md)** - Reproducibility system deep dive
 - **[NEXT_STEPS.md](NEXT_STEPS.md)** - Phase 1 integration roadmap
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute
 - **[ETHICS.md](ETHICS.md)** - Ethical framework & data stewardship
+
+### Reference & Changes
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and upgrade notes
+- **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Complete quality improvement history
+- **[docs/](docs/)** - Full technical documentation
 
 ---
 
