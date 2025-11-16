@@ -13,6 +13,7 @@ poetry run python examples/03_multi_universe.py
 poetry run python examples/04_bioelectric_rescue.py
 poetry run python examples/05_neuroscience_eeg_analysis.py
 poetry run python examples/06_ai_model_coherence.py
+poetry run python examples/07_quantum_observer_effects.py
 ```
 
 ## Examples Overview
@@ -203,6 +204,52 @@ Analyze internal coherence in neural networks:
 
 ---
 
+### 07_quantum_observer_effects.py - Quantum Physics Application
+
+**Difficulty**: Advanced
+**Runtime**: ~20 seconds
+**Topics**: Quantum mechanics, observer effects, measurement problem, decoherence, wave-particle duality
+
+Demonstrates quantum observer effects using K-Index:
+- Quantum wavefunction simulation and evolution
+- Observer measurement effects (wavefunction collapse)
+- Double-slit experiment with/without observation
+- Decoherence and quantum-to-classical transition
+- Observer-system coherence quantification
+
+**Key Learning**:
+- Applying K-Index to quantum mechanics
+- Quantifying the observer effect
+- Understanding measurement problem
+- Wave-particle duality demonstration
+- Quantum decoherence analysis
+
+**Physics Covered**:
+- Wavefunction superposition
+- Measurement-induced collapse
+- Double-slit interference
+- Observer effect quantification
+- Decoherence timescales
+- Quantum-classical boundary
+
+**Output**:
+- `outputs/example_07_quantum_observer.png` - Comprehensive quantum analysis
+- `logs/example_07_quantum_kcodex.json` - K-Codex records
+
+**Use Cases**:
+- Quantum foundations research
+- Observer effect quantification
+- Quantum information theory
+- Educational demonstrations
+- Quantum-classical transition studies
+
+**Theoretical Background**:
+This example demonstrates how K-Index can quantify observer-system correlations
+in quantum mechanics, providing a novel perspective on the measurement problem
+and the quantum-to-classical transition.
+
+---
+
 ### interactive_tutorial.ipynb - Complete Interactive Tutorial
 
 **Difficulty**: Beginner to Advanced
@@ -249,11 +296,14 @@ interactive_tutorial.ipynb      (Interactive learning - 60 min) [OPTIONAL]
 05_neuroscience_eeg_analysis.py (Real-world neuroscience - 15 min)
     ↓
 06_ai_model_coherence.py        (AI interpretability - 20 min)
+    ↓
+07_quantum_observer_effects.py  (Advanced physics - 20 min)
 ```
 
-**Total time**: ~2 hours (or ~3 hours with interactive tutorial)
+**Total time**: ~2.5 hours (or ~3.5 hours with interactive tutorial)
 
 **Quick Path** (essentials only): 01 → 02 → 05 or 06 (~35 min)
+**Physics Path** (quantum focus): 01 → 02 → 04 → 07 (~60 min)
 
 ## Common Patterns
 

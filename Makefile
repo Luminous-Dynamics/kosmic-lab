@@ -8,6 +8,7 @@ LOGDIR ?= logs/fre_phase1
 .PHONY: holochain-publish holochain-query holochain-verify mycelix-demo
 .PHONY: format type-check security-check ci-local review-improvements
 .PHONY: validate-install profile check-all migrate-v1.1 update-deps
+.PHONY: benchmark-parallel benchmark-suite performance-check profile-k-index profile-bootstrap
 
 help:  # Show all available targets
 	@echo "🌊 Kosmic Lab - Available Commands:"
@@ -91,6 +92,44 @@ benchmarks-save:  # Run and save benchmark results
 	@echo "⚡ Running and saving benchmarks..."
 	poetry run python benchmarks/run_benchmarks.py --save benchmarks/results/benchmark_$(shell date +%Y%m%d_%H%M%S).json
 	@echo "✅ Benchmarks saved!"
+
+benchmark-parallel:  # Compare serial vs parallel performance (Phase 14)
+	@echo "⚡ Comparing serial vs parallel performance..."
+	poetry run python benchmarks/suite.py --compare-parallel
+	@echo "✅ Parallel comparison complete!"
+
+benchmark-suite:  # Run comprehensive benchmark suite (Phase 14)
+	@echo "⚡ Running comprehensive benchmark suite..."
+	poetry run python benchmarks/suite.py
+	@echo "✅ Benchmark suite complete!"
+
+performance-check:  # Quick performance validation (smoke test)
+	@echo "⚡ Running quick performance check..."
+	@echo "Testing K-Index performance..."
+	poetry run python -c "from fre.metrics.k_index import k_index; import numpy as np; import time; \
+		np.random.seed(42); obs = np.random.randn(10000); act = np.random.randn(10000); \
+		start = time.time(); k = k_index(obs, act); elapsed = time.time() - start; \
+		print(f'K-Index (N=10k): {elapsed*1000:.2f} ms'); \
+		assert elapsed < 0.1, 'Performance regression detected!'"
+	@echo "✅ Performance check passed!"
+
+profile-k-index:  # Profile K-Index computation
+	@echo "⚡ Profiling K-Index computation..."
+	poetry run python -m cProfile -o profiling/k_index.stats -c \
+		"from fre.metrics.k_index import k_index; import numpy as np; \
+		np.random.seed(42); obs = np.random.randn(100000); act = np.random.randn(100000); \
+		k = k_index(obs, act)"
+	@echo "📊 Profile saved: profiling/k_index.stats"
+	@echo "View with: python -m pstats profiling/k_index.stats"
+
+profile-bootstrap:  # Profile bootstrap CI computation
+	@echo "⚡ Profiling bootstrap CI..."
+	poetry run python -m cProfile -o profiling/bootstrap_ci.stats -c \
+		"from fre.metrics.k_index import bootstrap_k_ci; import numpy as np; \
+		np.random.seed(42); obs = np.random.randn(1000); act = np.random.randn(1000); \
+		k, ci_low, ci_high = bootstrap_k_ci(obs, act, n_bootstrap=100, n_jobs=1)"
+	@echo "📊 Profile saved: profiling/bootstrap_ci.stats"
+	@echo "View with: python -m pstats profiling/bootstrap_ci.stats"
 
 clean:  # Remove generated files
 	rm -rf __pycache__ .pytest_cache htmlcov .coverage
