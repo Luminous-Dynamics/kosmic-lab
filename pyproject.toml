@@ -1,6 +1,6 @@
 [project]
 name = "kosmic-lab"
-version = "0.1.0"
+version = "1.1.0"
 description = "Unified research platform for the Kosmic Simulation & Coherence Framework."
 authors = [{name = "Kosmic Lab Team", email = "kosmic-lab@example.org"}]
 readme = "README.md"
@@ -28,14 +28,15 @@ Changelog = "https://github.com/Luminous-Dynamics/kosmic-lab/blob/main/CHANGELOG
 
 [tool.poetry]
 name = "kosmic-lab"
-version = "0.1.0"
+version = "1.1.0"
 description = "Unified research platform for the Kosmic Simulation & Coherence Framework."
 authors = ["Kosmic Lab Team <kosmic-lab@example.org>"]
 packages = [
     { include = "core" },
     { include = "fre" },
     { include = "historical_k" },
-    { include = "experiments" }
+    { include = "experiments" },
+    { include = "kosmic_lab" }
 ]
 
 [tool.poetry.dependencies]

@@ -10,6 +10,7 @@ LOGDIR ?= logs/fre_phase1
 .PHONY: validate-install profile check-all migrate-v1.1 update-deps
 .PHONY: benchmark-parallel benchmark-suite performance-check profile-k-index profile-bootstrap
 .PHONY: quick-start run-examples run-examples-quick health-check
+.PHONY: version info welcome list-examples clean-outputs
 
 help:  # Show all available targets
 	@echo "🌊 Kosmic Lab - Available Commands:"
@@ -92,6 +93,85 @@ health-check:  # Run comprehensive system health check (Phase 16)
 	chmod +x scripts/health_check.py
 	poetry run python scripts/health_check.py
 	@echo "✅ Health check complete!"
+
+version:  # Show version number (Phase 18)
+	@python -m kosmic_lab --version
+
+info:  # Show comprehensive system information (Phase 18)
+	@python -m kosmic_lab --info
+
+welcome:  # Display welcome message with quick start guide (Phase 18)
+	@echo "╔════════════════════════════════════════════════════════════════════╗"
+	@echo "║                           🌊 Kosmic Lab                           ║"
+	@echo "║     Revolutionary AI-Accelerated Platform for Consciousness       ║"
+	@echo "║                        Research v1.1.0                            ║"
+	@echo "╚════════════════════════════════════════════════════════════════════╝"
+	@echo ""
+	@echo "🚀 Quick Start (30 seconds):"
+	@echo "   1. make health-check      # Validate installation (9 checks)"
+	@echo "   2. python quick_start.py  # Experience Kosmic Lab!"
+	@echo "   3. make run-examples      # Explore more examples"
+	@echo ""
+	@echo "📚 Essential Commands:"
+	@echo "   make help                 # See all 60+ commands"
+	@echo "   make info                 # System information"
+	@echo "   make list-examples        # Browse all examples"
+	@echo "   make benchmark-suite      # Performance validation"
+	@echo ""
+	@echo "📖 Documentation:"
+	@echo "   README.md                 # Start here"
+	@echo "   QUICKSTART.md             # 5-minute guide"
+	@echo "   FAQ.md                    # 50+ common questions"
+	@echo "   docs/                     # Full technical docs"
+	@echo ""
+	@echo "Welcome to the future of consciousness research! 🌊"
+	@echo ""
+
+list-examples:  # List all examples with descriptions (Phase 18)
+	@echo "📚 Kosmic Lab Examples"
+	@echo "═══════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "🟢 Beginner (Start Here!):"
+	@echo "   quick_start.py                  - 30-second demo (RECOMMENDED!)"
+	@echo "   01_hello_kosmic.py              - K-Index basics (5 min)"
+	@echo ""
+	@echo "🟡 Intermediate:"
+	@echo "   02_advanced_k_index.py          - Statistical analysis (15 min)"
+	@echo "   03_multi_universe.py            - Multi-universe simulations (30 min)"
+	@echo ""
+	@echo "🔴 Advanced:"
+	@echo "   04_bioelectric_rescue.py        - Bioelectric morphogenesis (15 min)"
+	@echo "   05_neuroscience_eeg_analysis.py - EEG coherence analysis (20 min)"
+	@echo "   06_ai_model_coherence.py        - AI model evaluation (25 min)"
+	@echo "   07_quantum_observer_effects.py  - Quantum observer effects (20 min)"
+	@echo ""
+	@echo "═══════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "💡 Quick Commands:"
+	@echo "   make quick-start          # Run 30-second demo"
+	@echo "   make run-examples         # Run all examples with summary"
+	@echo "   poetry run python examples/01_hello_kosmic.py  # Run specific example"
+	@echo ""
+	@echo "📖 Learn More: See examples/README.md for detailed descriptions"
+	@echo ""
+
+clean-outputs:  # Remove generated outputs (keeps source code) (Phase 18)
+	@echo "🧹 Cleaning generated outputs..."
+	@echo ""
+	@echo "⚠️  This will remove:"
+	@echo "   - outputs/ (generated files from examples)"
+	@echo "   - logs/ (experiment logs)"
+	@echo "   - analysis/ (generated notebooks)"
+	@echo ""
+	@read -p "Continue? [y/N] " -n 1 -r; \
+	echo; \
+	if [ "$$REPLY" = "y" ] || [ "$$REPLY" = "Y" ]; then \
+		rm -rf outputs/ logs/ analysis/; \
+		echo "✅ Cleaned generated outputs!"; \
+		echo "💡 Source code preserved. Run 'make quick-start' to regenerate."; \
+	else \
+		echo "❌ Cancelled."; \
+	fi
 
 docs:  # Build Sphinx documentation
 	cd docs && poetry run make html
