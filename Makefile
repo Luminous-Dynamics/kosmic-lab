@@ -9,6 +9,7 @@ LOGDIR ?= logs/fre_phase1
 .PHONY: format type-check security-check ci-local review-improvements
 .PHONY: validate-install profile check-all migrate-v1.1 update-deps
 .PHONY: benchmark-parallel benchmark-suite performance-check profile-k-index profile-bootstrap
+.PHONY: quick-start run-examples run-examples-quick health-check
 
 help:  # Show all available targets
 	@echo "🌊 Kosmic Lab - Available Commands:"
@@ -68,6 +69,29 @@ demo:  # Run quick demo (5 min)
 	poetry run python fre/run.py --config fre/configs/k_config.yaml --universes 2 --samples 25
 	make notebook LOGDIR=logs
 	@echo "✅ Demo complete! Check logs/ and analysis/"
+
+quick-start:  # Run 30-second quick start demo (Phase 16)
+	@echo "🌊 Running Kosmic Lab quick start..."
+	poetry run python quick_start.py
+	@echo "✅ Quick start complete!"
+
+run-examples:  # Run all examples and generate summary (Phase 16)
+	@echo "🚀 Running all examples..."
+	chmod +x scripts/run_all_examples.py
+	poetry run python scripts/run_all_examples.py
+	@echo "✅ Examples complete!"
+
+run-examples-quick:  # Run examples (skip slow ones)
+	@echo "⚡ Running examples (quick mode)..."
+	chmod +x scripts/run_all_examples.py
+	poetry run python scripts/run_all_examples.py --quick
+	@echo "✅ Quick examples complete!"
+
+health-check:  # Run comprehensive system health check (Phase 16)
+	@echo "🏥 Running Kosmic Lab health check..."
+	chmod +x scripts/health_check.py
+	poetry run python scripts/health_check.py
+	@echo "✅ Health check complete!"
 
 docs:  # Build Sphinx documentation
 	cd docs && poetry run make html
