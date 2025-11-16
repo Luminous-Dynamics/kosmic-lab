@@ -7,16 +7,20 @@ This module provides coherence and K-index calculation utilities.
 from __future__ import annotations
 
 from fre.metrics.k_index import (
-    compute_k_index,
+    k_index,
     bootstrap_k_ci,
-    validate_k_bounds,
+    verify_k_bounds,
+    k_index_robust,
+    k_index_with_ci,
 )
-from fre.metrics.k_lag import k_lag, compute_lagged_correlation
+from fre.metrics.k_lag import k_lag, verify_causal_direction
 
 __all__ = [
-    "compute_k_index",
+    "k_index",
     "bootstrap_k_ci",
-    "validate_k_bounds",
+    "verify_k_bounds",
+    "k_index_robust",
+    "k_index_with_ci",
     "k_lag",
-    "compute_lagged_correlation",
+    "verify_causal_direction",
 ]

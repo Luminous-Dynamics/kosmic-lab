@@ -71,23 +71,42 @@ class KCodexWriter:
         - K_CODEX_MIGRATION.md for migration from K-Passport
     """
 
-    def __init__(self, schema_path: Path) -> None:
+    def __init__(self, schema_path: Path | str, validate: bool = None) -> None:
         """
-        Initialize K-Codex writer with JSON schema validation.
+        Initialize K-Codex writer.
 
         Args:
-            schema_path: Path to k_codex.json schema file
-                        (or k_passport.json for backwards compatibility)
+            schema_path: Either:
+                - Path to k_codex.json schema file (for build_record + validate)
+                - Path to output JSON log file (for log_experiment)
+            validate: If True, load schema and enable validation.
+                     If False or None, use simple logging mode.
+                     If None, auto-detect based on file extension (.json schema vs log file)
 
         Raises:
-            FileNotFoundError: If schema file doesn't exist
+            FileNotFoundError: If validate=True and schema file doesn't exist
         """
-        if not schema_path.exists():
-            raise FileNotFoundError(f"K-Codex schema missing: {schema_path}")
-        with schema_path.open("r", encoding="utf-8") as fh:
-            schema = json.load(fh)
-        self._validator = Draft7Validator(schema)
+        # Convert string to Path
+        if isinstance(schema_path, str):
+            schema_path = Path(schema_path)
+
         self.schema_path = schema_path
+
+        # Auto-detect mode if not specified
+        if validate is None:
+            # If file ends with k_codex.json or k_passport.json, assume it's a schema
+            validate = schema_path.name in ['k_codex.json', 'k_passport.json']
+
+        if validate:
+            # Schema validation mode (for build_record)
+            if not schema_path.exists():
+                raise FileNotFoundError(f"K-Codex schema missing: {schema_path}")
+            with schema_path.open("r", encoding="utf-8") as fh:
+                schema = json.load(fh)
+            self._validator = Draft7Validator(schema)
+        else:
+            # Simple logging mode (for log_experiment)
+            self._validator = None
 
     def build_record(
         self,
@@ -249,8 +268,99 @@ class KCodexWriter:
             json.dump(record, fh, indent=2, sort_keys=True)
         return path
 
+    def log_experiment(
+        self,
+        experiment_name: str,
+        params: Dict[str, Any],
+        metrics: Dict[str, Any],
+        seed: Optional[int] = None,
+    ) -> None:
+        """
+        Simplified API for logging experiments without schema validation.
+
+        This is a lightweight alternative to build_record() + write() that:
+        - Doesn't require schema files
+        - Automatically appends to existing log file
+        - Uses simple JSON format
+        - Perfect for quick experiments and examples
+
+        Args:
+            experiment_name: Name of the experiment
+            params: Experiment parameters
+            metrics: Experiment metrics/results
+            seed: Optional random seed for reproducibility
+
+        Example:
+            >>> kcodex = KCodexWriter(Path("logs/experiments.json"))
+            >>> kcodex.log_experiment(
+            ...     experiment_name="test_coherence",
+            ...     params={"n_samples": 1000},
+            ...     metrics={"k_index": 1.23},
+            ...     seed=42
+            ... )
+        """
+        # Helper to convert numpy types to Python types for JSON serialization
+        def convert_numpy(obj):
+            """Recursively convert numpy types to Python types."""
+            import numpy as np
+            if isinstance(obj, dict):
+                return {k: convert_numpy(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_numpy(item) for item in obj]
+            elif isinstance(obj, (np.integer, np.floating)):
+                return float(obj)
+            elif isinstance(obj, np.bool_):
+                return bool(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return obj
+
+        # Create log entry
+        entry = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "experiment": experiment_name,
+            "params": convert_numpy(params),
+            "metrics": convert_numpy(metrics),
+            "run_id": str(uuid4()),
+        }
+
+        if seed is not None:
+            entry["seed"] = seed
+
+        # Try to get git SHA if available
+        try:
+            git_sha = infer_git_sha()
+            if git_sha:
+                entry["git_sha"] = git_sha
+        except Exception:
+            pass  # OK if git not available
+
+        # Load existing log or create new list
+        if self.schema_path.exists():
+            try:
+                with self.schema_path.open("r", encoding="utf-8") as fh:
+                    logs = json.load(fh)
+                    if not isinstance(logs, list):
+                        logs = [logs]  # Convert single entry to list
+            except json.JSONDecodeError:
+                logs = []
+        else:
+            logs = []
+
+        # Append new entry
+        logs.append(entry)
+
+        # Write updated log
+        self.schema_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.schema_path.open("w", encoding="utf-8") as fh:
+            json.dump(logs, fh, indent=2, sort_keys=True)
+
     def _validate(self, record: Dict[str, Any]) -> None:
         """Validate record against K-Codex JSON schema."""
+        if self._validator is None:
+            # No validation in simple logging mode
+            return
+
         errors = sorted(self._validator.iter_errors(record), key=lambda e: e.path)
         if errors:
             msg = "; ".join(err.message for err in errors)

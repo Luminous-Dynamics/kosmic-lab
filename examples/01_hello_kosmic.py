@@ -55,8 +55,8 @@ k_estimate, k_lower, k_upper = bootstrap_k_ci(
     obs_norms,
     act_norms,
     n_bootstrap=1000,
-    confidence=0.95,
-    random_seed=42,
+    confidence_level=0.95,
+    seed=42,
 )
 
 logger.info(f"95% CI: [{k_lower:.3f}, {k_upper:.3f}]")
@@ -64,33 +64,27 @@ logger.info(f"95% CI: [{k_lower:.3f}, {k_upper:.3f}]")
 # Step 4: Create K-Codex for perfect reproducibility
 logger.info("Creating K-Codex (experimental record)...")
 
-codex_writer = KCodexWriter(Path("schemas/k_codex.json"))
+codex_writer = KCodexWriter(Path("logs/hello_kosmic_kcodex.json"))
 
-codex = codex_writer.build_record(
-    experiment="hello_kosmic_tutorial",
+codex_writer.log_experiment(
+    experiment_name="hello_kosmic_tutorial",
     params={
         "correlation": 0.7,
         "noise": 0.3,
         "timesteps": timesteps,
-    },
-    estimators={
-        "k_index_method": "pearson",
         "bootstrap_samples": 1000,
         "confidence_level": 0.95,
     },
     metrics={
-        "K": k_value,
-        "K_lower": k_lower,
-        "K_upper": k_upper,
+        "k_index": k_value,
+        "k_lower_ci": k_lower,
+        "k_upper_ci": k_upper,
         "in_corridor": k_value >= 1.0,
     },
     seed=42,
-    ci={"lower": k_lower, "upper": k_upper},
 )
 
-# Save K-Codex
-output_path = codex_writer.write(codex, Path("logs/hello_kosmic"))
-logger.info(f"✅ K-Codex saved: {output_path}")
+logger.info(f"✅ K-Codex saved: logs/hello_kosmic_kcodex.json")
 
 # Step 5: Analysis & Interpretation
 logger.info("\n" + "=" * 60)
