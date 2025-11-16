@@ -76,8 +76,8 @@ def compare_multiple_scenarios() -> None:
         k = k_index(obs, act)
 
         # Compute bootstrap CI
-        ci_lower, ci_upper = bootstrap_confidence_interval(
-            obs, lambda x: k_index(x, act), n_bootstrap=1000, confidence_level=0.95
+        k_estimate, ci_lower, ci_upper = bootstrap_confidence_interval(
+            obs, lambda x: k_index(x, act), n_bootstrap=1000, confidence=0.95
         )
 
         results.append(
