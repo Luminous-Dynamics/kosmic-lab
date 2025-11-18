@@ -2,11 +2,11 @@
 
 **Revolutionary AI-Accelerated Platform for Consciousness Research**
 
-[![Status](https://img.shields.io/badge/status-production--ready-success)](https://github.com/Luminous-Dynamics/kosmic-lab)
-[![Publications](https://img.shields.io/badge/publications-ready-blue)](KOSMIC_LAB_SESSION_2025_11_09_COMPLETE.md)
-[![Tests](https://img.shields.io/badge/coverage-90%25%2B-brightgreen)](https://codecov.io/gh/kosmic-lab)
-[![Reproducibility](https://img.shields.io/badge/reproducibility-99.9%25-blue)](FEATURES.md#k-passport-system)
-[![Integration](https://img.shields.io/badge/Mycelix-ready-purple)](docs/MYCELIX_INTEGRATION_ARCHITECTURE.md)
+[![Status](https://img.shields.io/badge/status-alpha-yellow)](https://github.com/Luminous-Dynamics/kosmic-lab)
+[![CI](https://github.com/Luminous-Dynamics/kosmic-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Luminous-Dynamics/kosmic-lab/actions)
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Integration](https://img.shields.io/badge/Mycelix-planned-purple)](docs/MYCELIX_INTEGRATION_ARCHITECTURE.md)
 
 > *"Coherence is love made computational."*
 
@@ -180,13 +180,15 @@ nix run .#run-archive-verify archives/track_g_bundle_20251113_143313.tar.gz
 
 ## 📊 Performance Metrics
 
-| Capability | Before | After | Improvement |
-|------------|--------|-------|-------------|
+*Target metrics based on design goals - validation in progress*
+
+| Capability | Traditional | Kosmic-Lab Target | Expected Improvement |
+|------------|-------------|-------------------|---------------------|
 | **Analysis time** | 2 hours | 30 seconds | **240x faster** |
 | **Experiments needed** | 200-300 | 60-90 | **70% reduction** |
 | **Bug detection** | Days | Minutes | **1000x faster** |
-| **Reproducibility** | ~50% | 99.9% | **Near-perfect** |
-| **Test coverage** | 25% | 90%+ | **3.6x increase** |
+| **Reproducibility** | ~50% | 99%+ | **Near-perfect** |
+| **Test coverage** | 25% | 80%+ | **3x+ increase** |
 
 ---
 
@@ -379,10 +381,11 @@ git push origin feature/your-feature
 ## 🏆 Recognition & Impact
 
 ### Current Status
-- ✅ **Production-ready** (10/10 across all categories)
-- ✅ **90%+ test coverage** with CI/CD
+- 🔬 **Alpha stage** - Core functionality implemented, needs broader testing
+- ✅ **CI/CD pipeline** - Automated testing on Python 3.10-3.12
 - ✅ **Comprehensive documentation** (QUICKSTART → GLOSSARY → FEATURES)
 - ✅ **Revolutionary features** (AI designer, auto-notebooks, dashboard)
+- 🚧 **Coverage TBD** - CI will establish baseline metrics
 
 ### Target Awards
 - 🎯 Nature Methods: "Tool of the Month"
@@ -461,6 +464,6 @@ make mycelix-demo
 
 ---
 
-*Last updated: November 9, 2025*
-*Status: Production-ready (10/10) with Mycelix integration in progress*
-*Version: 1.0.0-mycelix-alpha*
+*Last updated: November 18, 2025*
+*Status: Alpha - Core features implemented, CI/CD active, broader testing in progress*
+*Version: 0.1.0-alpha*
