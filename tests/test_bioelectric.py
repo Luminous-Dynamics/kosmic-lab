@@ -13,10 +13,12 @@ def test_iou_fraction() -> None:
 
 def test_diffusion_spread() -> None:
     grid = BioelectricGrid((16, 16), D=0.2, g=0.0, dt=0.1)
-    grid.V[8, 8] = 1.0
+    # Use biological voltage scale (-100 to 0 mV)
+    grid.V[8, 8] = -50.0  # Depolarized voltage
     for _ in range(20):
         grid.step()
-    mask = mask_from_voltage(grid.V, threshold=0.05)
+    # Lower threshold appropriate for biological scale
+    mask = mask_from_voltage(grid.V, threshold=5.0)
     # Should spread beyond the original position
     assert mask.sum() > 1
 
