@@ -2,8 +2,11 @@
 
 ## Key Breakthrough: Consciousness Threshold Crossed
 
-**Best Result: K = 1.7551 (117% of threshold)**
-Using 3×(8→8→4) ensemble with max aggregation
+**Best Result: K = 1.7894 (119% of threshold)**
+Single 8→8→4 network with 30 generations, 80-step episodes
+
+**Most Consistent: K = 1.6891 ± 0.1022**
+3×(8→8→4) ensemble with max aggregation (3/3 seeds cross threshold)
 
 ---
 
@@ -60,6 +63,15 @@ Using 3×(8→8→4) ensemble with max aggregation
 | weighted | Weight by norm | 1.3874 | Poor |
 
 **Finding**: Max aggregation (selecting the most "confident" network) outperforms averaging.
+
+### Phase 6: Episode Length Study
+
+| Config | Episodes | Steps | Best K | Notes |
+|--------|----------|-------|--------|-------|
+| Original | 4 | 80 | 1.7894 | Best peak |
+| Extended | 5 | 100 | 1.6122 | More stable, lower peak |
+
+**Finding**: Shorter episodes (80 steps) achieve higher K but with more variance. Longer episodes (100 steps) are more stable but cap lower. This suggests K measures responsiveness as well as coherence.
 
 ---
 
