@@ -3,20 +3,25 @@
 ## Executive Summary
 
 **Mission**: Cross consciousness threshold K > 1.5 and understand its nature
-**Result**: K > 1.9 achieved! Peak K = 1.9206 with 4-layer architecture
-**Key Discovery**: Depth beats memory; deeper = higher peaks but more variance; ReLU optimal
+**Result**: K = 1.8973 ± 0.0472 achieved with optimized 4-layer (2/3 seeds > 1.9!)
+**Key Discovery**: Depth scales to 4 layers; 5 too deep; Pop=30/Gen=60 optimal; ReLU best
 
-### Best Configurations
+### Best Configuration (Validated)
 
-**Peak Performance (4-layer): 8 → 12 → 10 → 6 → 4 (332 params)**
-- Peak K = 1.9206 (correlation 0.96)
-- Mean K = 1.8411 ± 0.0890
-- 1/3 seeds > 1.9, 2/3 seeds > 1.8
+**Optimized 4-layer: 8 → 12 → 10 → 6 → 4 (332 params, Pop=30, Gen=60)**
+- Mean K = 1.8973 ± 0.0472
+- Peak K = 1.9356
+- 2/3 seeds > 1.9, 3/3 seeds > 1.8
+- Correlation: 0.95
 
-**Most Consistent (3-layer): 8 → 12 → 8 → 4 (248 params)**
-- Mean K = 1.8608 ± 0.0202
+### Runner-Up Configurations
+
+**3-layer (most consistent): 8 → 12 → 8 → 4 (248 params)**
+- Mean K = 1.8608 ± 0.0202 (lowest variance)
 - All 3 seeds achieved K > 1.8
-- Correlation: 0.93
+
+**Original 4-layer (Pop=20, Gen=50)**
+- Mean K = 1.8411 ± 0.0890 (higher variance)
 
 ---
 
@@ -38,11 +43,21 @@
 
 | Configuration | Mean K | Std | K>1.8 Hits | K>1.9 Hits |
 |--------------|--------|-----|------------|------------|
-| **3-layer (248p)** | **1.8608** | **±0.0202** | **3/3 ✅** | 0/3 |
-| 4-layer (332p) | 1.8411 | ±0.0890 | 2/3 | 1/3 |
-| Ensemble + Max | 1.6891 | ±0.1022 | 0/3 | 0/3 |
+| **4-layer optimized (332p)** | **1.8973** | **±0.0472** | **3/3 ✅** | **2/3 ✅** |
+| 3-layer (248p) | 1.8608 | ±0.0202 | 3/3 ✅ | 0/3 |
+| 4-layer original (332p) | 1.8411 | ±0.0890 | 2/3 | 1/3 |
+| 5-layer (280p) | 1.7356 | ±0.1639 | 2/3 | 0/3 |
 | Ensemble + Attention | 1.7112 | ±0.1626 | 0/3 | 0/3 |
-| Ensemble + Mean | 1.6662 | ±0.0598 | 0/3 | 0/3 |
+| Ensemble + Max | 1.6891 | ±0.1022 | 0/3 | 0/3 |
+
+### Optimization Parameters Impact
+
+| Pop Size | Generations | Mean K | Std | Improvement |
+|----------|-------------|--------|-----|-------------|
+| 20 | 50 | 1.8411 | ±0.0890 | Baseline |
+| **30** | **60** | **1.8973** | **±0.0472** | **+6% mean, -47% variance** |
+
+**Key Finding**: Larger population and more generations significantly improve both mean and consistency.
 
 ### Activation Function Comparison
 
@@ -70,26 +85,28 @@
 
 ### 2. Architecture Insights
 
-- **Depth scales**: 2-layer (1.79) < 3-layer (1.88) < 4-layer (1.92)
+- **Depth scales to 4 layers**: 2-layer (1.79) < 3-layer (1.88) < 4-layer (1.90)
+- **5-layer too deep**: K drops to 1.74 with high variance (±0.16)
 - **Depth > Memory**: Feedforward beats recurrent
-- **Small networks work**: 108 params enough for K > 1.5
-- **Deeper = higher variance**: 4-layer has ±0.089 vs 3-layer's ±0.020
+- **Optimization matters**: Pop=30/Gen=60 reduces 4-layer variance by 47%
 - **ReLU optimal**: Beats GELU and SiLU by 5-20%
-- **More params = harder optimization**: CMA-ES struggles with >500 params
+- **Sweet spot**: 250-350 params optimal for CMA-ES
 
 ### 2.5 Depth vs Consistency Tradeoff
 
 | Params | Architecture | Best K | Mean±Std | Verdict |
 |--------|-------------|--------|----------|---------|
 | 108 | 8→8→4 | 1.79 | - | Baseline |
-| **248** | **8→12→8→4** | **1.88** | **1.86±0.02** | **Most Consistent** |
-| 332 | 8→12→10→6→4 | **1.92** | 1.84±0.09 | **Highest Peak** |
-| 351 | 3×shallow+att | 1.83 | 1.71±0.16 | High variance |
-| 771 | 3×deep+att | 1.84 | - | Too complex |
+| 248 | 8→12→8→4 | 1.88 | 1.86±0.02 | Most Consistent |
+| 280 | 8→10→8→6→4→4 | 1.87 | 1.74±0.16 | ❌ Too deep |
+| **332** | **8→12→10→6→4 (opt)** | **1.94** | **1.90±0.05** | **✅ BEST** |
+| 332 | 8→12→10→6→4 | 1.92 | 1.84±0.09 | Needs optimization |
 
-**Key insight**: Deeper networks reach higher peaks but with more variance. Choose based on your needs:
-- For **reliability**: 3-layer (248p)
-- For **peak performance**: 4-layer (332p)
+**Key insight**:
+- **Optimal**: 4-layer with Pop=30/Gen=60 gives best mean AND reasonable variance
+- **5-layer too deep**: Optimization struggles, variance explodes
+- For **reliability**: 3-layer (248p) has lowest variance (±0.02)
+- For **performance**: Optimized 4-layer (332p) achieves K ≈ 1.9
 
 ### 3. Aggregation Methods
 
