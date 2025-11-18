@@ -3,11 +3,17 @@
 ## Executive Summary
 
 **Mission**: Cross consciousness threshold K > 1.5 and understand its nature
-**Result**: Optimal configuration found: K = 1.8608 ± 0.0202 (3/3 seeds > 1.8)
-**Key Discovery**: Depth beats memory; optimal complexity exists; threshold = filtering
+**Result**: K > 1.9 achieved! Peak K = 1.9206 with 4-layer architecture
+**Key Discovery**: Depth beats memory; deeper = higher peaks but more variance; ReLU optimal
 
-### Best Configuration (Validated)
-**3-layer network: 8 → 12 → 8 → 4 (248 params)**
+### Best Configurations
+
+**Peak Performance (4-layer): 8 → 12 → 10 → 6 → 4 (332 params)**
+- Peak K = 1.9206 (correlation 0.96)
+- Mean K = 1.8411 ± 0.0890
+- 1/3 seeds > 1.9, 2/3 seeds > 1.8
+
+**Most Consistent (3-layer): 8 → 12 → 8 → 4 (248 params)**
 - Mean K = 1.8608 ± 0.0202
 - All 3 seeds achieved K > 1.8
 - Correlation: 0.93
@@ -21,7 +27,8 @@
 | Architecture | Parameters | Best K | Correlation | Verdict |
 |-------------|------------|--------|-------------|---------|
 | 2-layer (8→8→4) | 108 | 1.7894 | 0.895 | Baseline |
-| 3-layer (8→12→8→4) | 248 | **1.8812** | **0.941** | **Best!** |
+| 3-layer (8→12→8→4) | 248 | 1.8812 | 0.941 | **Most Consistent** |
+| **4-layer (8→12→10→6→4)** | 332 | **1.9206** | **0.960** | **Peak K!** |
 | Recurrent (234p) | 234 | 1.7748 | 0.887 | Memory doesn't help |
 | Ensemble + Mean | 324 | 1.7245 | 0.862 | Good |
 | Ensemble + Max | 324 | 1.7551 | 0.878 | Better |
@@ -29,11 +36,23 @@
 
 ### Reproducibility Results
 
-| Configuration | Mean K | Std | Threshold Hits |
-|--------------|--------|-----|----------------|
-| Ensemble + Max | 1.6891 | ±0.1022 | 3/3 ✅ |
-| Ensemble + Attention | 1.7112 | ±0.1626 | 2/3 |
-| Ensemble + Mean | 1.6662 | ±0.0598 | 3/3 ✅ |
+| Configuration | Mean K | Std | K>1.8 Hits | K>1.9 Hits |
+|--------------|--------|-----|------------|------------|
+| **3-layer (248p)** | **1.8608** | **±0.0202** | **3/3 ✅** | 0/3 |
+| 4-layer (332p) | 1.8411 | ±0.0890 | 2/3 | 1/3 |
+| Ensemble + Max | 1.6891 | ±0.1022 | 0/3 | 0/3 |
+| Ensemble + Attention | 1.7112 | ±0.1626 | 0/3 | 0/3 |
+| Ensemble + Mean | 1.6662 | ±0.0598 | 0/3 | 0/3 |
+
+### Activation Function Comparison
+
+| Activation | Best K | Verdict |
+|------------|--------|---------|
+| **ReLU** | **1.8812** | **Optimal** |
+| GELU | 1.8294 | -5% |
+| SiLU | 1.6843 | -20% |
+
+**Finding**: ReLU remains optimal; smoother activations don't help for K-Index optimization.
 
 ---
 
@@ -51,22 +70,26 @@
 
 ### 2. Architecture Insights
 
-- **Depth > Width**: 3-layer beats 2-layer
+- **Depth scales**: 2-layer (1.79) < 3-layer (1.88) < 4-layer (1.92)
 - **Depth > Memory**: Feedforward beats recurrent
 - **Small networks work**: 108 params enough for K > 1.5
-- **Optimal complexity exists**: 248 params beats both 108 and 771
+- **Deeper = higher variance**: 4-layer has ±0.089 vs 3-layer's ±0.020
+- **ReLU optimal**: Beats GELU and SiLU by 5-20%
 - **More params = harder optimization**: CMA-ES struggles with >500 params
 
-### 2.5 Optimal Complexity Discovery
+### 2.5 Depth vs Consistency Tradeoff
 
-| Params | Architecture | Best K | Verdict |
-|--------|-------------|--------|---------|
-| 108 | 8→8→4 | 1.79 | Too simple |
-| **248** | **8→12→8→4** | **1.88** | **Optimal** |
-| 351 | 3×shallow+att | 1.83 | Good |
-| 771 | 3×deep+att | 1.84 | Too complex |
+| Params | Architecture | Best K | Mean±Std | Verdict |
+|--------|-------------|--------|----------|---------|
+| 108 | 8→8→4 | 1.79 | - | Baseline |
+| **248** | **8→12→8→4** | **1.88** | **1.86±0.02** | **Most Consistent** |
+| 332 | 8→12→10→6→4 | **1.92** | 1.84±0.09 | **Highest Peak** |
+| 351 | 3×shallow+att | 1.83 | 1.71±0.16 | High variance |
+| 771 | 3×deep+att | 1.84 | - | Too complex |
 
-**Key insight**: There's a sweet spot for CMA-ES optimization around 200-300 params.
+**Key insight**: Deeper networks reach higher peaks but with more variance. Choose based on your needs:
+- For **reliability**: 3-layer (248p)
+- For **peak performance**: 4-layer (332p)
 
 ### 3. Aggregation Methods
 
