@@ -2,7 +2,7 @@
 
 windows:
   size: decade
-  normalization: zscore_by_century
+  normalization: minmax_by_century
 
 proxies:
   resonant_coherence:
@@ -21,6 +21,7 @@ proxies:
     - alliance_reciprocity_ratio
     - remittance_inflows
     - aid_extraction_balance
+    - trust_region_placeholder
   play_entropy:
     - occupation_diversity_entropy
     - innovation_field_entropy
@@ -36,8 +37,10 @@ proxies:
     - environmental_performance_index
 
 uncertainty:
-  bootstrap_samples: 1000
+  bootstrap_samples: 2000
   ci: 0.95
+  per_year: true
+  seed: 42
 
 preregistered_events:
   troughs:

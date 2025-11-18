@@ -6,6 +6,7 @@ LOGDIR ?= logs/fre_phase1
 .PHONY: help init lint test fre-run historical-run docs
 .PHONY: dashboard notebook ai-suggest coverage demo clean
 .PHONY: holochain-publish holochain-query holochain-verify mycelix-demo
+.PHONY: checkpoint-info checkpoint-list checkpoint-copy config-register config-lookup config-diff track-g track-h log-tail log-validate archive-artifacts archive-summary archive-verify
 
 help:  # Show all available targets
 	@echo "🌊 Kosmic Lab - Available Commands:"
@@ -41,6 +42,15 @@ fre-summary:  # Aggregate FRE K-passports
 
 historical-run:  # Compute Historical K(t) from 1800-2020
 	poetry run python historical_k/compute_k.py --config historical_k/k_config.yaml
+
+historical-compare:  # Compare normalization strategies
+	poetry run python historical_k/comparison.py
+
+historical-contrib:  # Harmony rolling correlation contributions
+	poetry run python historical_k/contributions.py
+
+historical-report:  # Generate consolidated markdown report
+	poetry run python historical_k/report.py
 
 dashboard:  # Launch real-time interactive dashboard
 	poetry run python scripts/kosmic_dashboard.py --logdir $(LOGDIR) --port 8050
@@ -85,6 +95,69 @@ validate:  # Run all checks (tests, lint, coverage)
 
 quick:  # Quick validation (tests only)
 	poetry run pytest -x --tb=short -q
+
+checkpoint-info:  # Inspect checkpoint metadata (CHECKPOINT=path/to.json)
+	@if [ -z "$(CHECKPOINT)" ]; then echo "Set CHECKPOINT=..."; exit 1; fi
+	poetry run python scripts/checkpoint_tool.py info --path "$(CHECKPOINT)"
+
+checkpoint-list:  # List checkpoints in directory (DIR=logs/track_g/checkpoints)
+	@if [ -z "$(DIR)" ]; then echo "Set DIR=..."; exit 1; fi
+	poetry run python scripts/checkpoint_tool.py list --dir "$(DIR)"
+
+checkpoint-copy:  # Copy checkpoint (SRC=... DEST=...)
+	@if [ -z "$(SRC)" ] || [ -z "$(DEST)" ]; then echo "Set SRC=... and DEST=..."; exit 1; fi
+	poetry run python scripts/checkpoint_tool.py copy --src "$(SRC)" --dest "$(DEST)" $(if $(OVERWRITE),--overwrite,)
+
+config-register:  # Register config hash/label (CONFIG=... LABEL="...")
+	@if [ -z "$(CONFIG)" ] || [ -z "$(LABEL)" ]; then echo "Set CONFIG=... and LABEL=..."; exit 1; fi
+	poetry run python scripts/config_registry.py register --config "$(CONFIG)" --label "$(LABEL)" $(if $(NOTES),--notes "$(NOTES)",)
+
+config-lookup:  # Lookup config info (HASH=... or CONFIG=...)
+	@if [ -z "$(HASH)" ] && [ -z "$(CONFIG)" ]; then echo "Set HASH=... or CONFIG=..."; exit 1; fi
+	poetry run python scripts/config_registry.py lookup $(if $(HASH),--hash "$(HASH)",) $(if $(CONFIG),--config "$(CONFIG)",)
+
+config-diff:  # Diff two configs (A=..., B=...)
+	@if [ -z "$(A)" ] || [ -z "$(B)" ]; then echo "Set A=... and B=..."; exit 1; fi
+	poetry run python scripts/config_registry.py diff --config-a "$(A)" --config-b "$(B)"
+
+log-tail:  # Tail JSONL episode log (PATH=logs/track_g/episodes/*.jsonl, LINES=20, FOLLOW=1)
+	@if [ -z "$(PATH)" ]; then echo "Set PATH=..."; exit 1; fi
+	poetry run python scripts/log_tool.py tail --path "$(PATH)" --lines $${LINES:-20} $(if $(FOLLOW),--follow,)
+
+log-validate:  # Validate JSONL log structure (PATH=logs/track_g/episodes/*.jsonl)
+	@if [ -z "$(PATH)" ]; then echo "Set PATH=..."; exit 1; fi
+	poetry run python scripts/log_tool.py validate --path "$(PATH)"
+
+archive-artifacts:  # Snapshot checkpoint + log + config (CHECKPOINT=..., LOG=..., CONFIG=..., OUTPUT optional)
+	@if [ -z "$(CHECKPOINT)" ] || [ -z "$(CONFIG)" ]; then echo "Set CHECKPOINT=... CONFIG=... (LOG optional)"; exit 1; fi
+	poetry run python scripts/archive_tool.py create --checkpoint "$(CHECKPOINT)" $(if $(LOG),--log "$(LOG)",) --config "$(CONFIG)" $(if $(OUTPUT),--output "$(OUTPUT)",)
+
+archive-verify:  # Verify archive bundle (ARCHIVE=archives/*.tar.gz)
+	@if [ -z "$(ARCHIVE)" ]; then echo "Set ARCHIVE=..."; exit 1; fi
+	poetry run python scripts/archive_tool.py verify --archive "$(ARCHIVE)"
+
+archive-summary:  # Print archive metadata summary (ARCHIVE=archives/*.tar.gz)
+	@if [ -z "$(ARCHIVE)" ]; then echo "Set ARCHIVE=..."; exit 1; fi
+	poetry run python scripts/archive_tool.py summary --archive "$(ARCHIVE)"
+
+track-g:  # Run Track G phase (PHASE=g2, CONFIG=fre/configs/track_g_phase_g2.yaml)
+	@PHASE=$${PHASE:-g2}; CONFIG=$${CONFIG:-fre/configs/track_g_phase_g2.yaml}; \
+	ARGS="--config $$CONFIG --phase $$PHASE"; \
+	if [ -n "$(WARM_LOAD)" ]; then ARGS="$$ARGS --warm-start-load '$(WARM_LOAD)'"; fi; \
+	if [ -n "$(WARM_SAVE)" ]; then ARGS="$$ARGS --warm-start-save '$(WARM_SAVE)'"; fi; \
+	if [ -n "$(ALLOW_MISMATCH)" ]; then ARGS="$$ARGS --warm-start-allow-mismatch"; fi; \
+	if [ -n "$(DRY_RUN)" ]; then ARGS="$$ARGS --dry-run"; fi; \
+	echo "🌊 Running Track G phase '$$PHASE' with $$CONFIG"; \
+	poetry run python fre/track_g_runner.py $$ARGS
+
+track-h:  # Run Track H memory integration (CONFIG=fre/configs/track_h_memory.yaml)
+	@CONFIG=$${CONFIG:-fre/configs/track_h_memory.yaml}; \
+	ARGS="--config $$CONFIG"; \
+	if [ -n "$(WARM_LOAD)" ]; then ARGS="$$ARGS --warm-start-load '$(WARM_LOAD)'"; fi; \
+	if [ -n "$(WARM_SAVE)" ]; then ARGS="$$ARGS --warm-start-save '$(WARM_SAVE)'"; fi; \
+	if [ -n "$(DRY_RUN)" ]; then ARGS="$$ARGS --dry-run"; fi; \
+	echo "🧠 Running Track H memory integration with $$CONFIG"; \
+	poetry run python fre/track_h_runner.py $$ARGS
 
 # ========== Mycelix Integration ==========
 

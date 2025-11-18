@@ -70,6 +70,9 @@ poetry install --sync
 
 # Option 2: Standard Python
 poetry install --sync
+
+# Verify toolchain + tests (installs pytest via poetry)
+make test
 ```
 
 ### Your First Experiment
@@ -86,12 +89,91 @@ make ai-suggest
 
 # Auto-generate analysis notebook
 make notebook
+
+# Inspect/organize checkpoints (see docs/WARM_START_GUIDE.md)
+make checkpoint-list DIR=logs/track_g/checkpoints
+make checkpoint-info CHECKPOINT=logs/track_g/checkpoints/phase_g2_latest.json
+poetry run python scripts/checkpoint_tool.py extract-config --path logs/track_g/checkpoints/phase_g2_latest.json --output extracted_phase_g2.yaml
+# (Each checkpoint embeds config path/hash + git commit automatically.)
+
+# Launch Track G / Track H runs (override PHASE/CONFIG as needed)
+make track-g PHASE=g2 CONFIG=fre/configs/track_g_phase_g2.yaml
+make track-h CONFIG=fre/configs/track_h_memory.yaml
+
+# Override warm-start paths on the fly
+make track-g PHASE=g2 WARM_LOAD=/tmp/phase_g2_best.json WARM_SAVE=/tmp/g2_continuation.json
+make track-h WARM_LOAD=/tmp/phase_g2_best.json
+
+# Validate a setup without running episodes
+make track-g PHASE=g2 DRY_RUN=1
+make track-h DRY_RUN=1
+
+# Stream per-episode metrics to JSONL (set experiment.log_jsonl.enabled=true)
+poetry run python fre/track_g_runner.py --config fre/configs/track_g_phase_g2.yaml --phase g2
+
+# Tail / validate JSONL episode logs
+make log-tail PATH=logs/track_g/episodes/phase_g2.jsonl FOLLOW=1
+make log-validate PATH=logs/track_g/episodes/phase_g2.jsonl
+
+# Archive checkpoint + log + config snapshot
+make archive-artifacts CHECKPOINT=logs/track_g/checkpoints/phase_g2_latest.json \
+                        LOG=logs/track_g/episodes/phase_g2.jsonl \
+                        CONFIG=fre/configs/track_g_phase_g2.yaml
+# (Archive now includes both config YAML and checkpoint-embedded snapshot.)
+
+# Verify archived bundle hashes
+make archive-verify ARCHIVE=archives/track_g_bundle_20251113_143313.tar.gz
+nix run .#run-archive-verify archives/track_g_bundle_20251113_143313.tar.gz
+
+# Summarize archive metadata
+make archive-summary ARCHIVE=archives/track_g_bundle_20251113_143313.tar.gz
+nix run .#run-archive-summary archives/track_g_bundle_20251113_143313.tar.gz
+poetry run python scripts/archive_tool.py summary --archive archives/track_g_bundle_20251113_143313.tar.gz --markdown --markdown-path release.md
+
+# Diff config snapshots stored in archive (CLI)
+poetry run python scripts/archive_tool.py diff --archive archives/track_g_bundle_20251113_143313.tar.gz
+# Diff archive snapshot vs current config file
+poetry run python scripts/archive_tool.py diff --archive archives/track_g_bundle_20251113_143313.tar.gz \
+    --config fre/configs/track_g_phase_g2.yaml
+
+# Intentionally reuse checkpoint despite config mismatch (use sparingly)
+make track-g PHASE=g2 WARM_LOAD=/tmp/old_ckpt.json ALLOW_MISMATCH=1
+
+# Register / lookup config hashes (human-readable labels)
+make config-register CONFIG=fre/configs/track_g_phase_g2.yaml LABEL="Track G Phase G2" NOTES="Extended training baseline"
+make config-lookup CONFIG=fre/configs/track_g_phase_g2.yaml
+
+# Compare two configs (diff) using registry helpers
+make config-diff A=fre/configs/track_g_phase_g2.yaml B=fre/configs/track_g_phase_g3.yaml
 ```
+
+Prefer raw CLI? Pass `--warm-start-load` / `--warm-start-save` directly to `fre/track_g_runner.py` or `fre/track_h_runner.py` to override YAML without editing configs.
+
+`nix flake check` now runs pytest, Black lint, registry formatting validation, and a sample archive-create/verify routine (checked against `schemas/archive_metadata.schema.json`), so bundles stay reproducible by default. Set `experiment.log_jsonl.enabled: true` (and optionally `path`) inside any Track G config to emit streaming JSONL suitable for dashboards. Files land under `logs/track_g/episodes/` by default.
 
 ### See All Commands
 
 ```bash
 make help
+```
+
+### Nix Workflow (Repro Recommended)
+
+```bash
+# Drop into dev shell with all tools (python, poetry, LaTeX)
+nix develop
+
+# Run pytest via flake app (works from anywhere)
+nix run .#run-tests
+
+# Run lint (black --check) via flake app
+nix run .#run-lint
+
+# Execute all configured checks (currently pytest)
+nix flake check
+
+# Verify archive hashes without leaving Nix
+nix run .#run-archive-verify archives/track_g_bundle_20251113_143313.tar.gz
 ```
 
 ---
@@ -115,6 +197,7 @@ make help
 - **[GLOSSARY.md](GLOSSARY.md)** - 40+ key concepts explained
 - **[FEATURES.md](FEATURES.md)** - Complete revolutionary features catalog
 - **[TRANSFORMATION_SUMMARY.md](TRANSFORMATION_SUMMARY.md)** - Our journey to 10/10
+- **[WARM_START_GUIDE.md](docs/WARM_START_GUIDE.md)** - Capture/resume agents with checkpoints
 
 ### Publication Standards
 - **[PUBLICATION_STANDARDS.md](PUBLICATION_STANDARDS.md)** - 📄 **LaTeX workflow for all papers** (mandatory)
@@ -144,7 +227,10 @@ kosmic-lab/
 │   ├── ai_experiment_designer.py    # Bayesian optimization
 │   ├── generate_analysis_notebook.py # Auto-analysis
 │   ├── kosmic_dashboard.py          # Real-time dashboard
-│   └── holochain_bridge.py          # Mycelix integration
+│   ├── holochain_bridge.py          # Mycelix integration
+│   ├── checkpoint_tool.py           # Inspect/share warm-start checkpoints
+│   ├── log_tool.py                  # Tail/validate JSONL episode streams
+│   └── config_registry.py           # Label config hashes for reproducibility
 ├── tests/             # 90%+ coverage (unit + integration + property-based)
 ├── holochain/         # Mycelix DHT integration
 └── docs/              # Comprehensive documentation
