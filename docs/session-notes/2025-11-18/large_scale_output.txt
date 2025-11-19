@@ -1,0 +1,12 @@
+🌟 Luminous-Dynamics Development Environment
+📦 Node.js: 20.19.3
+🦀 Rust: rustc 1.88.0 (6b00bc388 2025-06-23)
+❄️  Nix: nix (Nix) 2.31.2
+
+Commands:
+  lum-start  - Start all services
+  lum-status - Connect to overmind
+  lum-stop   - Stop all services
+
+🌊 We flow with Nix!
+Terminated                 python3 large_scale_validation.py
