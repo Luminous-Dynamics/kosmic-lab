@@ -140,6 +140,13 @@ K = 2 × |r| where r = pearsonr(||obs||, ||act||)
 - Correlation-based K is uncorrelated with 7-Harmony K
 - They measure fundamentally different things
 
+**H5: K ANTI-CORRELATES with Performance** (Critical!)
+- Full K vs Performance: r = -0.47 (p = 0.019)
+- Simple K vs Performance: r = -0.40 (p = 0.047)
+- **Higher K = WORSE task performance!**
+- Best performing agents (300 steps) have K ≈ 0.6-0.9
+- Failing agents (22 steps) have K ≈ 1.9
+
 ---
 
 ## Implications for Research
@@ -213,11 +220,31 @@ For correlation optimization, specific architecture details (normalization, acti
 
 ## Conclusion
 
-Our K > 1.9 results are **mathematically valid** but **conceptually limited**. We've optimized a correlation metric that measures signal-to-noise filtering, not consciousness or coherence in any meaningful sense.
+Our K > 1.9 results are **mathematically valid** but **conceptually problematic**. Not only does K measure signal-to-noise filtering rather than coherence, it **anti-correlates with task performance**. High K networks fail faster.
 
-The key insight: **correlation is not coherence**. For future work claiming to measure "consciousness" or "coherence," the full 7-Harmony formalism or actual IIT computations are required.
+### Key Insights
 
-This session represents rigorous scientific self-correction: we've falsified our own naming assumptions and clarified what our metric actually measures.
+1. **Correlation is not coherence** - Simple K measures proportional responsiveness, not integration
+2. **High K is harmful** - Networks optimized for K perform worse on actual tasks
+3. **The "threshold" is backwards** - K > 1.5 indicates rigidity, not consciousness
+
+### What K Actually Measures
+
+K measures how **proportionally** a network responds to input magnitude. High K means:
+- Large input → Large output (proportional)
+- This creates rigid, predictable behavior
+- But real tasks require **context-sensitive** responses, not proportional ones
+
+Good CartPole agents learn to give **appropriate** responses (sometimes large action for small perturbation, sometimes vice versa), resulting in LOW correlation and LOW K.
+
+### Recommendation
+
+**Abandon K-Index as a success metric.** If used at all, it should be:
+- Renamed to "Proportional Response Index"
+- Treated as a regularization term (minimize, not maximize)
+- Never described as measuring "consciousness" or "coherence"
+
+This session represents rigorous scientific self-correction: we've falsified our own metric and discovered it measures the opposite of what we intended.
 
 ---
 
